@@ -16,7 +16,9 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 == Features
 
-* XXX
+The general idea is that Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run, and if a fragment is stale, the controller behavior will definitely run. This eliminates duplicate work.
+
+Plus there is some stuff for automatic cache invalidation, including invalidation of fragments based on the model lifecyle.
 
 == Installation
   
@@ -32,13 +34,7 @@ Now, configure Rails to use memcached for its fragment cache store. Get it worki
  
 == Usage
 
-The general idea is that Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run, and if a fragment is stale, the controller behavior will definitely run. This eliminates duplicate work.
-
-Plus there is some stuff for automatic cache invalidation, including invalidation of fragments based on the model lifecyle.
-
 Interlock provides two similar caching methods: <tt>behavior_cache</tt> for controllers and <tt>view_cache</tt> for views. The both accept an optional list or hash of model dependencies, and an optional <tt>:tag</tt> keypair. <tt>view_cache</tt> also accepts a <tt>ttl</tt>.
-
-== Examples
 
 The simplest usage doesn't require any parameters. In the controller:
 
