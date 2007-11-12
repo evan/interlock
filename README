@@ -97,9 +97,13 @@ This way each user will see only their own cache. Pretty neat.
 
 == Gotchas
 
+You will not see any actual cache reuse in development mode unless you set <tt>config.action_controller.perform_caching = true</tt> in <tt>config/environments/development.rb</tt>.
+
 <b>If you have custom <tt>render</tt> calls in the controller, they must be outside the <tt>behavior_cache</tt> blocks.</b> No exceptions.
 
 You can write custom invalidation rules if you really want to, but try hard to avoid it; it has a significant cost in long-term maintainability.
+
+Also, Interlock obeys the <tt>ENV['RAILS_ASSET_ID']</tt> setting, so if you need to blanket-invalidate all your caches, just change <tt>RAILS_ASSET_ID</tt> (for example, you could have it increment on every deploy).
 
 == Reporting problems
 
