@@ -1,6 +1,8 @@
 
 ActionController::Base.class_eval do    
 
+  self.fragment_cache_store = CACHE   
+
   #
   # Build the fragment key from a particular context. This must be deterministic 
   # and stateful except for the tag. We can't scope the key to arbitrary params 
@@ -42,11 +44,11 @@ ActionController::Base.class_eval do
   end
   
   alias :caching :behavior_cache # XXX Legacy
-  
+
 end
 
 ActionView::Helpers::CacheHelper.class_eval do
-
+  
   # Mark a corresponding view block for caching. Accepts a :tag key for 
   # explicit scoping. You can specify dependencies here if you really want to.
   def view_cache(*args, &block)

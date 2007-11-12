@@ -1,7 +1,107 @@
 
-Interlock caching plugin
+Interlock
+
+An optimal efficiency caching plugin for Rails.
 
 == License
 
-Copyright 2007 Cloudburst, LLC. All rights reserved. Not licensed
-for any use whatsoever to anybody.
+Copyright 2007 Cloudburst, LLC. All rights reserved. Not licensed for any use whatsoever to anybody. Portions copyright 2006 Chris Wanstrath and used with permission.
+
+The public certificate for the gem is at http://rubyforge.org/frs/download.php/25331/evan_weaver-original-public_cert.pem.
+
+== Requirements
+
+* Memcached
+* The memcache-client Ruby library
+
+== Features
+
+* XXX
+
+== Installation
+  
+First, compile and install memcached itself. Get a memcached server running on some port.
+
+You also need the <tt>memcache-client</tt> gem:
+  sudo gem install memcache-client
+
+Then, install the plugin:
+  script/plugin install -x svn://rubyforge.org/var/svn/fauna/interlock/trunk
+  
+Now, configure Rails to use memcached for its fragment cache store. Get it working with a regular <tt>cache</tt> block before worrying about Interlock.
+ 
+== Usage
+
+The general idea is that Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run, and if a fragment is stale, the controller behavior will definitely run. This eliminates duplicate work.
+
+Plus there is some stuff for automatic cache invalidation, including invalidation of fragments based on the model lifecyle.
+
+Interlock provides two similar caching methods: <tt>behavior_cache</tt> for controllers and <tt>view_cache</tt> for views. The both accept an optional list or hash of model dependencies, and an optional <tt>:tag</tt> keypair. <tt>view_cache</tt> also accepts a <tt>ttl</tt>.
+
+== Examples
+
+The simplest usage doesn't require any parameters. In the controller:
+
+  class ItemController < ActionController::Base
+  
+    def slow_action
+      behavior_cache do
+        @items = Item.find(:conditions => "be slow")
+      end
+    end
+    
+  end
+  
+Now, in the view, wrap the associated ERB template block in a <tt>view_cache</tt> method. That's all. 
+
+You've now automatically registered a caching dependency on Item for <tt>slow_action</tt>. The controller block won't run if the <tt>slow_action</tt> view cache is fresh, and the view cache will only get invalidated when an Item is changed.
+
+== Declaring dependencies
+
+You can declare non-default invalidation dependencies by passing models to <tt>behavior_cache</tt> (you can also pass them to <tt>view_cache</tt>, but you should only do that if you are caching a fragment without an associated behavior block in the controller). Examples:
+
+  # No dependencies (cache never invalidates)
+  behavior_cache nil do
+  end
+  
+  # Invalidates on any Media change
+  behavior_cache Media do
+  end
+  
+  # Invalidates on any Media or Item change
+  behavior_cache Media, Item do
+  end
+  
+  # Invalidates on Item changes if the Item id matches the current 
+  # params[:id] value.
+  behavior_cache Item => :id do
+  end
+
+You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt>view_cache</tt> even for the same action. The set union of both dependencies lists will be used.
+
+== Scoping and caching multiple blocks
+
+If you need to cache multiple blocks in a controller, use the <tt>:tag</tt> keypair. Tag accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is dealt with appropriately in most situations. Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.
+
+Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache multiple copies of the same block for different action invocations. This is great for caching per-user, for example:
+
+  def profile
+    @user = current_user
+    behavior_cache :tag => @user do
+      @items = Item.find(:conditions => "be slow")
+    end
+  end
+
+In the view, use the same tag value (<tt>@user</tt>). Note that <tt>@user</tt> must be set outside of the behavior block in the controller, because its contents are used to decide whether to run the block in the first place.
+
+This way each user will see only their own cache. Pretty neat.
+
+== Gotchas
+
+* If you have custom <tt>render</tt> calls in the controller, they must be outside the <tt>behavior_cache</tt> blocks. No exceptions.
+
+== Reporting problems
+
+* http://rubyforge.org/forum/forum.php?forum_id=18926
+
+Patches and contributions are very welcome. Please note that contributors are required to assign copyright for their additions to Cloudburst, LLC. 
