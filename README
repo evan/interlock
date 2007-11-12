@@ -60,15 +60,15 @@ You can declare non-default invalidation dependencies by passing models to <tt>b
   behavior_cache nil do
   end
   
-<b>Invalidates on any Media change:</b>
+<b>Invalidate on any Media change:</b>
   behavior_cache Media do
   end
   
-<b>Invalidates on any Media or Item change:</b>
+<b>Invalidate on any Media or Item change:</b>
   behavior_cache Media, Item do
   end
   
-<b>Invalidates on Item changes if the Item <tt>id</tt> matches the current <tt>params[:id]</tt> value:</b>
+<b>Invalidate on Item changes if the Item <tt>id</tt> matches the current <tt>params[:id]</tt> value:</b>
   behavior_cache Item => :id do
   end
 
