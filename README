@@ -16,7 +16,7 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 == Features
 
-The general idea is that Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run, and if a fragment is stale, the controller behavior will definitely run. This eliminates duplicate work.
+Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run, and if a fragment is stale, the controller behavior will definitely run. This eliminates duplicate work.
 
 Plus there is some stuff for automatic cache invalidation, including invalidation of fragments based on the model lifecyle.
 
