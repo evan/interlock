@@ -1,5 +1,9 @@
 
-ActionController::Base.class_eval do    
+ActionController::Base
+ActionView::Helpers::CacheHelper
+ActiveRecord::Base
+
+class ActionController::Base
 
   self.fragment_cache_store = CACHE   
 
@@ -47,7 +51,7 @@ ActionController::Base.class_eval do
 
 end
 
-ActionView::Helpers::CacheHelper.class_eval do
+class ActionView::Helpers::CacheHelper do
   
   # Mark a corresponding view block for caching. Accepts a :tag key for 
   # explicit scoping. You can specify dependencies here if you really want to.
@@ -66,7 +70,7 @@ ActionView::Helpers::CacheHelper.class_eval do
   
 end
 
-ActiveRecord::Base.class_eval do
+class ActiveRecord::Base do
 
   def self.caching_dependencies #:nodoc:
     @caching_dependencies ||= []
