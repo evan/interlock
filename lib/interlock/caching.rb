@@ -51,7 +51,7 @@ class ActionController::Base
 
 end
 
-class ActionView::Helpers::CacheHelper do
+module ActionView::Helpers::CacheHelper
   
   # Mark a corresponding view block for caching. Accepts a :tag key for 
   # explicit scoping. You can specify dependencies here if you really want to.
@@ -70,7 +70,7 @@ class ActionView::Helpers::CacheHelper do
   
 end
 
-class ActiveRecord::Base do
+class ActiveRecord::Base
 
   def self.caching_dependencies #:nodoc:
     @caching_dependencies ||= []
