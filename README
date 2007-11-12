@@ -52,28 +52,27 @@ The simplest usage doesn't require any parameters. In the controller:
     
   end
   
-Now, in the view, wrap the associated ERB template block in a <tt>view_cache</tt> method. That's all. 
+Now, in the view, wrap the associated ERB template block in a <tt>view_cache</tt> method.
 
 You've now automatically registered a caching dependency on Item for <tt>slow_action</tt>. The controller block won't run if the <tt>slow_action</tt> view cache is fresh, and the view cache will only get invalidated when an Item is changed.
 
 == Declaring dependencies
 
-You can declare non-default invalidation dependencies by passing models to <tt>behavior_cache</tt> (you can also pass them to <tt>view_cache</tt>, but you should only do that if you are caching a fragment without an associated behavior block in the controller). Examples:
+You can declare non-default invalidation dependencies by passing models to <tt>behavior_cache</tt> (you can also pass them to <tt>view_cache</tt>, but you should only do that if you are caching a fragment without an associated behavior block in the controller).
 
-  # No dependencies (cache never invalidates)
+<b>No dependencies (cache never invalidates):</b>
   behavior_cache nil do
   end
   
-  # Invalidates on any Media change
+<b>Invalidates on any Media change:</b>
   behavior_cache Media do
   end
   
-  # Invalidates on any Media or Item change
+<b>Invalidates on any Media or Item change:</b>
   behavior_cache Media, Item do
   end
   
-  # Invalidates on Item changes if the Item id matches the current 
-  # params[:id] value.
+<b>Invalidates on Item changes if the Item id matches the current params[:id] value:</b>
   behavior_cache Item => :id do
   end
 
@@ -81,7 +80,7 @@ You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt
 
 == Scoping and caching multiple blocks
 
-If you need to cache multiple blocks in a controller, use the <tt>:tag</tt> keypair. Tag accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is dealt with appropriately in most situations. Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.
+If you need to cache multiple blocks in a controller, use the <tt>:tag</tt> keypair. Tag accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is dealt with appropriately in most situations. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
 
 Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache multiple copies of the same block for different action invocations. This is great for caching per-user, for example:
 
@@ -98,7 +97,9 @@ This way each user will see only their own cache. Pretty neat.
 
 == Gotchas
 
-* If you have custom <tt>render</tt> calls in the controller, they must be outside the <tt>behavior_cache</tt> blocks. No exceptions.
+<b>If you have custom <tt>render</tt> calls in the controller, they must be outside the <tt>behavior_cache</tt> blocks.</b> No exceptions.
+
+You can write custom invalidation rules if you really want to, but try hard to avoid it; it has a significant cost in long-term maintainability.
 
 == Reporting problems
 
