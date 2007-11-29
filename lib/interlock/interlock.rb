@@ -13,7 +13,7 @@ module Interlock
     # Extract the dependencies from the rest of the arguments and registers
     # them with the appropriate models.
     # 
-    def extract_options_and_register_dependencies(dependencies)
+    def extract_options_and_dependencies(dependencies)
       options = ActiveRecord::Base.send(:extract_options_from_args!, dependencies)
       
       # Hook up the dependencies nested array.
@@ -42,13 +42,17 @@ module Interlock
         dependencies = [[controller_name.classify.constantize, :all]] rescue []
       end
       
-      # Add each key with scope to the appropriate dependencies array.
-      dependencies.compact.each do |klass, scope|
+      [options.indifferentiate, dependencies]
+    end 
+    
+    #
+    # Add each key with scope to the appropriate dependencies array.
+    #
+    def register_dependencies(dependencies, key)
+      Array(dependencies).compact.each do |klass, scope|
         klass.add_caching_dependency key, scope
       end
-      
-      options.indifferentiate
-    end 
+    end
 
     def say(key, msg) #:nodoc:
       RAILS_DEFAULT_LOGGER.warn "** fragment #{key.inspect} #{msg}"

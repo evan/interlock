@@ -32,9 +32,10 @@ class ActionController::Base
   # Mark a controller block for caching. Accepts a list of class dependencies for
   # invalidation, as well as a :tag key for explicit fragment scoping.
   def behavior_cache(*args)  
-    options = Interlock.extract_options_and_register_dependencies(args)
-    key = caching_key(options.value_for_indifferent_key(:tag))
-    
+    options, dependencies = Interlock.extract_options_and_dependencies(args)
+    key = caching_key(options.value_for_indifferent_key(:tag))      
+    Interlock.register_dependencies(dependencies, key)
+        
     # See if the fragment exists, and run the block if it doesn't.
     unless ActionController::Base.fragment_cache_store.get(key)    
       Interlock.say key, "is running the controller block"
@@ -51,8 +52,10 @@ module ActionView::Helpers::CacheHelper
   # Mark a corresponding view block for caching. Accepts a :tag key for 
   # explicit scoping. You can specify dependencies here if you really want to.
   def view_cache(*args, &block)
-    options = Interlock.extract_options_and_register_dependencies(args)  
-    key = controller.caching_key(options.value_for_indifferent_key(:tag))
+    options, dependencies = Interlock.extract_options_and_dependencies(args)  
+    key = controller.caching_key(options.value_for_indifferent_key(:tag))      
+    Interlock.register_dependencies(dependencies, key)
+
     Interlock.say key, "is rendering"
     @controller.cache_erb_fragment(
       block, 
@@ -82,7 +85,7 @@ class ActiveRecord::Base
   # The expiry callback.
   def expire_interlock_keys
     self.class.caching_dependencies.each do |key, scope|
-      if scope == :all or (scope == :id and key.field(4).to_i == self.id)
+      if scope == :all or (scope == :id and key.field(4) == self.to_param.to_s)
         Interlock.say key, "invalidated by rule #{self.class} -> #{scope.inspect}."
         Interlock.invalidate key
       end
