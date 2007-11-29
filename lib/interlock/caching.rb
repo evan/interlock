@@ -32,13 +32,8 @@ class ActionController::Base
   # Mark a controller block for caching. Accepts a list of class dependencies for
   # invalidation, as well as a :tag key for explicit fragment scoping.
   def behavior_cache(*args)  
-    options, dependencies = Interlock.extract_options_and_dependencies(args)
+    options = Interlock.extract_options_and_register_dependencies(args)
     key = caching_key(options.value_for_indifferent_key(:tag))
-
-    # Add each key with scope to the appropriate dependencies array.
-    Array(dependencies).compact.each do |klass, scope|
-      klass.add_caching_dependency key, scope
-    end
     
     # See if the fragment exists, and run the block if it doesn't.
     unless ActionController::Base.fragment_cache_store.get(key)    
@@ -56,7 +51,7 @@ module ActionView::Helpers::CacheHelper
   # Mark a corresponding view block for caching. Accepts a :tag key for 
   # explicit scoping. You can specify dependencies here if you really want to.
   def view_cache(*args, &block)
-    options, dependencies = Interlock.extract_options_and_dependencies(args)  
+    options = Interlock.extract_options_and_register_dependencies(args)  
     key = controller.caching_key(options.value_for_indifferent_key(:tag))
     Interlock.say key, "is rendering"
     @controller.cache_erb_fragment(

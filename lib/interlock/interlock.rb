@@ -13,7 +13,7 @@ module Interlock
     # Extract the dependencies from the rest of the arguments and registers
     # them with the appropriate models.
     # 
-    def extract_options_and_dependencies(dependencies)
+    def extract_options_and_register_dependencies(dependencies)
       options = ActiveRecord::Base.send(:extract_options_from_args!, dependencies)
       
       # Hook up the dependencies nested array.
@@ -35,12 +35,19 @@ module Interlock
           dependencies << [klass, scope.to_sym]
         end
       end    
+
       unless dependencies.any?
         # Use the conventional controller/model association if none are provided
         # Can be skipped by calling caching(nil)
         dependencies = [[controller_name.classify.constantize, :all]] rescue []
       end
-      [options.indifferentiate, dependencies]
+      
+      # Add each key with scope to the appropriate dependencies array.
+      dependencies.compact.each do |klass, scope|
+        klass.add_caching_dependency key, scope
+      end
+      
+      options.indifferentiate
     end 
 
     def say(key, msg) #:nodoc:
