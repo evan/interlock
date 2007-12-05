@@ -12,7 +12,7 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 == Requirements
 
 * Memcached
-* The memcache-client Ruby library
+* memcache-client gem
 
 == Features
 
@@ -32,7 +32,20 @@ You also need the <tt>memcache-client</tt> gem:
 Then, install the plugin:
   script/plugin install -x svn://rubyforge.org/var/svn/fauna/interlock/trunk
   
-Now, configure Rails to use memcached for its fragment cache store. Get it working with a regular <tt>cache</tt> block before worrying about Interlock.
+Lastly, configure your Rails app for memcached by creating a <tt>config/memcached.yml</tt>. The format is compatible with Cache_fu:
+
+  defaults:
+    namespace: myapp
+    sessions: false
+  development:
+    servers: 
+      - localhost:11211
+  production:
+    servers
+      - 10.12.128.1
+      - 10.12.128.2     
+      
+Now you're ready to go.
  
 == Usage
 
