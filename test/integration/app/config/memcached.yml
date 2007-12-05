@@ -1,0 +1,9 @@
+defaults:
+  ttl: 30
+  namespace: interlock
+  sessions: true
+
+development:
+  servers: 
+    - localhost:11211
+    - localhost:11212

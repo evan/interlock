@@ -1,20 +1,27 @@
 
 module Interlock
 
-  class DependencyError < StandardError
+  class InterlockError < StandardError
   end  
-  
-  mattr_accessor :config  
-  @@config = {:ttl => 1.day}
+  class DependencyError < InterlockError
+  end  
+  class UsageError < InterlockError
+  end
+    
+  #
+  # Store the dependency graph. We put it here because Rails destroys anything
+  # we attach to the classes themselves when it reloads in development mode.
+  #
+  mattr_accessor :dependencies
+  @@dependencies = {}
 
   class << self
-
     #
     # Extract the dependencies from the rest of the arguments and registers
     # them with the appropriate models.
     # 
-    def extract_options_and_dependencies(dependencies)
-      options = ActiveRecord::Base.send(:extract_options_from_args!, dependencies)
+    def extract_options_and_dependencies(dependencies, default = nil)
+      options = dependencies.extract_options!
       
       # Hook up the dependencies nested array.
       dependencies.map! { |klass| [klass, :all] }
@@ -31,7 +38,7 @@ module Interlock
           #
           # "But I need it!" you say. All right, then start using key tags.
           #
-          raise Interlock::DependencyError, "#{scope} is not a valid scope" unless [:all, :id].include?(scope)
+          raise Interlock::DependencyError, "#{scope.inspect} is not a valid scope" unless [:all, :id].include?(scope)
           dependencies << [klass, scope.to_sym]
         end
       end    
@@ -39,8 +46,11 @@ module Interlock
       unless dependencies.any?
         # Use the conventional controller/model association if none are provided
         # Can be skipped by calling caching(nil)
-        dependencies = [[controller_name.classify.constantize, :all]] rescue []
+        dependencies = [[default, :all]]
       end
+      
+      # Remove nils
+      dependencies.reject! {|klass, scope| klass.nil? }
       
       [options.indifferentiate, dependencies]
     end 
@@ -49,8 +59,14 @@ module Interlock
     # Add each key with scope to the appropriate dependencies array.
     #
     def register_dependencies(dependencies, key)
-      Array(dependencies).compact.each do |klass, scope|
-        klass.add_caching_dependency key, scope
+      Array(dependencies).each do |klass, scope|
+        Interlock.dependencies[klass.name] ||= {}
+        
+        # Make sure to not overwrite broader scopes
+        unless Interlock.dependencies[klass.name][key] == :all
+          Interlock.dependencies[klass.name][key] = scope
+          Interlock.say key, "registered a dependency on #{klass} -> #{scope.inspect}."        
+        end        
       end
     end
 

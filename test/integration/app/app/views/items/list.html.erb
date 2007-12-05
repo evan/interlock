@@ -1,0 +1,9 @@
+
+<h1>List</h1>
+<% view_cache do %>
+  <% @items.each do |item| %>
+    <h3><%= item.name %></h3>
+    <p><%= item.description %></p>
+  <% end %>
+<% end %>
+

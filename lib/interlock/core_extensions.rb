@@ -17,7 +17,26 @@ class Hash
 
   def indifferentiate
     self.dup.indifferentiate!    
-  end   
+  end
+  
+  def deep_symbolize_keys!
+    symbolize_keys!
+    values.each do |value|
+      value.deep_symbolize_keys! if value.is_a? Hash
+    end
+  end
+  
+end
+
+class Array  
+  unless Array.instance_methods.include? "extract_options!"
+  
+    def extract_options!
+      # Method added in Rails rev 7217
+      last.is_a?(Hash) ? pop : {}
+    end
+    
+  end  
 end
 
 class String
