@@ -1,9 +1,12 @@
 CHANGELOG
 init.rb
+lib/interlock/action_controller.rb
+lib/interlock/action_view.rb
+lib/interlock/active_record.rb
 lib/interlock/config.rb
 lib/interlock/core_extensions.rb
 lib/interlock/interlock.rb
-lib/interlock/rails.rb
+lib/interlock/memcached.rb
 lib/interlock.rb
 Manifest
 README
@@ -17,6 +20,7 @@ test/integration/app/app/models/item.rb
 test/integration/app/app/views/items/list.html.erb
 test/integration/app/app/views/items/recent.html.erb
 test/integration/app/app/views/items/show.html.erb
+test/integration/app/app/views/shared/_related.html.erb
 test/integration/app/config/boot.rb
 test/integration/app/config/database.yml
 test/integration/app/config/environment.rb
@@ -68,4 +72,5 @@ test/integration/app/test/unit/item_test.rb
 test/integration/server_test.rb
 test/setup.rb
 test/test_helper.rb
+test/unit/memcached_test.rb
 TODO
