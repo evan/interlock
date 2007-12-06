@@ -1,5 +1,7 @@
 class ItemsController < ApplicationController
 
+  before_filter :related
+
   def index
     behavior_cache do
       @items = Item.find(:all)
@@ -16,6 +18,14 @@ class ItemsController < ApplicationController
   def recent
     behavior_cache nil, :tag => [:seconds] do
       @items = Item.find(:all, :conditions => ['updated_at >= ?', params['seconds'].to_i.ago])
+    end
+  end
+  
+  private
+  
+  def related
+    behavior_cache :ignore => :all, :tag => 'related' do
+      @related = "Delicious cake"
     end
   end
   

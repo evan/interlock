@@ -4,13 +4,11 @@ require 'open-uri'
 require 'cgi'
 require 'fileutils'
 
-# Start the server
-
 class ServerTest < Test::Unit::TestCase
 
   PORT = 43041
   URL = "http://localhost:#{PORT}/"
-  LOG = "#{RAILS_ROOT}/log/development.log"     
+  LOG = "#{HERE}/integration/app/log/development.log"     
 
   Dir.chdir RAILS_ROOT do
     COVERAGE = "coverage"    
@@ -28,71 +26,90 @@ class ServerTest < Test::Unit::TestCase
   
   def test_caching
     browse("items")
-    assert_match(/running the controller block/, log)
-    assert_match(/all:untagged. is rendering/, log)
+    assert_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged is rendering/, log)
     truncate
     browse("items")
-    assert_no_match(/running the controller block/, log)
-    assert_match(/all:untagged. is rendering/, log)
-    assert_match(/Fragment read/, log)
+    assert_no_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged is rendering/, log)
+    assert_match(/Fragment read.*all:untagged/, log)
   end
   
   def test_broad_invalidation
     browse("items")
-    assert_match(/running the controller block/, log)
-    assert_match(/all:untagged. is rendering/, log)
+    assert_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged is rendering/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(:first).save!")
-    assert_match(/invalidated by rule Item \-\> .all/, log)
+    assert_match(/all:untagged invalidated by rule Item \-\> .all/, log)
     browse("items")
-    assert_match(/running the controller block/, log)
-    assert_match(/all:untagged. is rendering/, log)      
+    assert_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged is rendering/, log)      
   end
 
   def test_narrow_invalidation
     browse("items/show/1")
-    assert_match(/running the controller block/, log)
-    assert_match(/show.1.untagged. is rendering/, log)
+    assert_match(/show:1:untagged is running the controller block/, log)
+    assert_match(/show:1:untagged is rendering/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(2).save!")
-    assert_no_match(/show.1.untagged. invalidated/, log)
+    assert_no_match(/show:1:untagged invalidated/, log)
     browse("items/show/1")
-    assert_no_match(/running the controller block/, log)
-    assert_match(/show.1.untagged. is rendering/, log)
+    assert_no_match(/show:1:untagged is running the controller block/, log)
+    assert_match(/show:1:untagged is rendering/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(1).save!")
-    assert_match(/show.1.untagged. invalidated/, log)
+    assert_match(/show:1:untagged invalidated/, log)
     browse("items/show/1")
-    assert_match(/running the controller block/, log)
-    assert_match(/show.1.untagged. is rendering/, log)
+    assert_match(/show:1:untagged is running the controller block/, log)
+    assert_match(/show:1:untagged is rendering/, log)
   end
-
   
   def test_caching_with_tag
     sleep(3)
     assert_no_match(/Artichoke/, browse("items/recent?seconds=3"))
-    assert_match(/recent.all.3. is running the controller block/, log)
+    assert_match(/recent:all:3 is running the controller block/, log)
 
     truncate
     assert_no_match(/Artichoke/, browse("items/recent?seconds=2"))
-    assert_match(/recent.all.2. is running the controller block/, log)
-    assert_no_match(/recent.all.3. is running the controller block/, log)
+    assert_match(/recent:all:2 is running the controller block/, log)
+    assert_no_match(/recent:all:3 is running the controller block/, log)
     
     truncate
     assert_no_match(/Artichoke/, browse("items/recent?seconds=3"))
-    assert_no_match(/recent.all.3. is running the controller block/, log)
+    assert_no_match(/recent:all:3 is running the controller block/, log)
     
     truncate
     remote_eval("Item.find(1).save!")
     assert_match(/Artichoke/, browse("items/recent?seconds=3"))
-    assert_match(/recent.all.3. is running the controller block/, log)
+    assert_match(/recent:all:3 is running the controller block/, log)
   end  
+  
+  def test_caching_with_ignore
+    assert_match(/Delicious cake/, browse('items'))
+    assert_match(/any:any:all:related is running the controller block/, log)
+    assert_match(/any:any:all:related is rendering/, log)
+    
+    truncate
+    assert_match(/Delicious cake/, browse("items/show/2"))
+    assert_no_match(/any:any:all:related is running the controller block/, log)
+    assert_match(/any:any:all:related is rendering/, log)
+
+    truncate
+    remote_eval("Item.find(1).save!")
+    assert_match(/Delicious cake/, browse("items/show/2"))
+    assert_match(/any:any:all:related invalidated/, log)
+    assert_match(/any:any:all:related is running the controller block/, log)
+    assert_match(/any:any:all:related is rendering/, log)
+  end
   
   
   ### Support methods
+  
+  private
   
   def truncate
     system("> #{LOG}")
@@ -105,10 +122,14 @@ class ServerTest < Test::Unit::TestCase
   end
   
   def browse(url = "")
+    flag = false    
     begin
       open(URL + url).read
-    rescue OpenURI::HTTPError => e
-      raise "#{e.to_s}: #{URL + url}"
+    rescue Errno::ECONNREFUSED, OpenURI::HTTPError => e      
+      raise "#{e.to_s}: #{URL + url}" if flag
+      flag = true
+      sleep 3
+      retry
     end
   end
   

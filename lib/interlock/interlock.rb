@@ -7,14 +7,9 @@ module Interlock
   end  
   class UsageError < InterlockError
   end
+  
+  SCOPE_KEYS = [:controller, :action, :id]
     
-  #
-  # Store the dependency graph. We put it here because Rails destroys anything
-  # we attach to the classes themselves when it reloads in development mode.
-  #
-  mattr_accessor :dependencies
-  @@dependencies = {}
-
   class << self
     #
     # Extract the dependencies from the rest of the arguments and registers
@@ -60,18 +55,33 @@ module Interlock
     #
     def register_dependencies(dependencies, key)
       Array(dependencies).each do |klass, scope|
-        Interlock.dependencies[klass.name] ||= {}
+        dep_key = dependency_key(klass)
         
-        # Make sure to not overwrite broader scopes
-        unless Interlock.dependencies[klass.name][key] == :all
-          Interlock.dependencies[klass.name][key] = scope
-          Interlock.say key, "registered a dependency on #{klass} -> #{scope.inspect}."        
-        end        
+        # Get the value for this class/key out of the global store.
+        this = (CACHE.get(dep_key) || {})[key]
+
+        # Make sure to not overwrite broader scopes.
+        unless this == :all or this == scope
+          # We need to write, so acquire the lock.            
+          CACHE.lock(dep_key) do |hash|
+            Interlock.say key, "registered a dependency on #{klass} -> #{scope.inspect}."
+            (hash || {}).merge({key => scope})
+          end
+        end
+        
       end
     end
 
     def say(key, msg) #:nodoc:
-      RAILS_DEFAULT_LOGGER.warn "** fragment #{key.inspect} #{msg}"
+      RAILS_DEFAULT_LOGGER.warn "** fragment #{key.inspect[1..-2]} #{msg}"
+    end
+     
+    #   
+    # Get the Memcached key for a class's dependency list. We store per-class 
+    # to reduce lock contention.
+    #
+    def dependency_key(klass) #:nodoc:
+      "interlock:#{ENV['RAILS_ASSET_ID']}:dependency:#{klass.name}"
     end
     
     # 

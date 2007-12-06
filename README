@@ -57,7 +57,7 @@ The simplest usage doesn't require any parameters. In the controller:
   
     def slow_action
       behavior_cache do
-        @items = Item.find(:conditions => "be slow")
+        @items = Item.find(:all, :conditions => "be slow")
       end
     end
     
@@ -89,22 +89,40 @@ You can declare non-default invalidation dependencies by passing models to <tt>b
 
 You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt>view_cache</tt> even for the same action. The set union of both dependencies lists will be used.
 
-== Scoping and caching multiple blocks
+== Narrowing scope and caching multiple blocks
 
-If you need to cache multiple blocks in a controller, use the <tt>:tag</tt> keypair. Tag accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is dealt with appropriately in most situations. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
+Sometimes you need to cache multiple blocks in a controller, or otherwise get a more fine-grained scope. Interlock provides the <tt>:tag</tt> keypair for this purpose. <tt>:tag</tt> accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is converted to a string identifier. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
 
 Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache multiple copies of the same block for different action invocations. This is great for caching per-user, for example:
 
   def profile
     @user = current_user
     behavior_cache :tag => @user do
-      @items = Item.find(:conditions => "be slow")
+      @items = Item.find(:all, :conditions => "be slow")
     end
   end
 
 In the view, use the same tag value (<tt>@user</tt>). Note that <tt>@user</tt> must be set outside of the behavior block in the controller, because its contents are used to decide whether to run the block in the first place.
 
 This way each user will see only their own cache. Pretty neat.
+
+== Broadening scope
+
+Sometimes the default scope (<tt>controller</tt>, <tt>action</tt>, <tt>params[:id]</tt>) is too narrow. For example, you might share a partial across actions, and set up its data via a filter. By default, Interlock will cache a separate version of it for each action. To avoid this, you can use the <tt>:ignore</tt> key, which lets you list parts of the default scope to ignore:
+
+  before_filter :recent
+  
+  private
+  
+  def recent
+    behavior_cache :ignore => :action do
+      @recent = Item.find(:all, :limit => 5, :order => 'updated_at DESC')
+    end
+  end
+
+Valid values for <tt>:ignore</tt> are <tt>:controller</tt>, <tt>:action</tt>, <tt>:id</tt>, and <tt>:all</tt>. You can pass an array of multiple values. <b>Just like with <tt>:tag</tt>, your corresponding behavior caches and view caches must have identical <tt>:ignore</tt> values.</b> Note that cache blocks with <tt>:ignore</tt> values still obey the regular invalidation rules.
+
+A good way to get started is to just use the default scope. Then <tt>grep</tt> in the production log for <tt>interlock</tt> and see what keys are being set and read. If you see lots of different keys go by for data that you know is the same, then set some <tt>:ignore</tt> values. 
 
 == Gotchas
 
@@ -114,7 +132,7 @@ You will not see any actual cache reuse in development mode unless you set <tt>c
 
   def profile
     behavior_cache do
-      @items = Item.find(:conditions => "be slow")
+      @items = Item.find(:all, :conditions => "be slow")
     end
     render :action => 'home'
   end

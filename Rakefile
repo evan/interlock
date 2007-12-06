@@ -1,5 +1,6 @@
 
 require 'echoe'
+require 'load_multi_rails_rake_tasks'
 
 Echoe.new("interlock") do |p|
   p.project = "fauna"
@@ -7,5 +8,5 @@ Echoe.new("interlock") do |p|
   p.url = "http://blog.evanweaver.com/files/doc/fauna/interlock/"  
   p.docs_host = "blog.evanweaver.com:~/www/bax/public/files/doc/"  
   p.dependencies = "memcache_client"
-  p.test_pattern = ["test/integration/*.rb"]
+  p.test_pattern = ["test/integration/*.rb", "test/unit/*.rb"]
 end
