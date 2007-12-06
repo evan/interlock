@@ -124,6 +124,16 @@ Valid values for <tt>:ignore</tt> are <tt>:controller</tt>, <tt>:action</tt>, <t
 
 A good way to get started is to just use the default scope. Then <tt>grep</tt> in the production log for <tt>interlock</tt> and see what keys are being set and read. If you see lots of different keys go by for data that you know is the same, then set some <tt>:ignore</tt> values. 
 
+== View-only caching
+
+It's fine to use a <tt>view_cache</tt> block without a <tt>behavior_cache</tt> block. For example, to mimic regular fragment cache behavior, but take advantage of Memcached's <tt>:ttl</tt> support, call:
+
+  <% view_cache nil, :ignore => :all, :tag => 'sidebar', :ttl => 5.minutes %>
+    <h1>On the side</h1>
+  <% end %> 
+  
+Remember that <tt>nil</tt> disables invalidation rules. This is a nice trick for keeping your caching strategy unified.
+
 == Gotchas
 
 You will not see any actual cache reuse in development mode unless you set <tt>config.action_controller.perform_caching = true</tt> in <tt>config/environments/development.rb</tt>.
