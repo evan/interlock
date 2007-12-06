@@ -45,7 +45,7 @@ class String
   end
   
   def escape_tag_fragment
-    gsub(':', '-').gsub(/[^\w\d;]/, '_')
+    gsub(':', '-').gsub(/[^\w\d-;]/, '_')
   end
 end
 
