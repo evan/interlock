@@ -32,7 +32,7 @@ class ServerTest < Test::Unit::TestCase
     browse("items")
     assert_no_match(/all:untagged is running the controller block/, log)
     assert_match(/all:untagged is rendering/, log)
-    assert_match(/Fragment read.*all:untagged/, log)
+    assert_match(/all:untagged read from memcached/, log)
   end
   
   def test_broad_invalidation

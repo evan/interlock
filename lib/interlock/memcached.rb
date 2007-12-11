@@ -1,5 +1,6 @@
 
 class MemCache
+
   def lock(key, lock_expiry = 30, retries = 5)
     retries.times do |count|
       response = CACHE.add("lock:#{key}", "Locked by #{Process.pid}", lock_expiry)
@@ -17,4 +18,5 @@ class MemCache
     end
     raise MemCacheError, "Couldn't acquire lock for #{key}"
   end
+  
 end

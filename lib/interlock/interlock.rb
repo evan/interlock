@@ -9,6 +9,8 @@ module Interlock
   end
   
   SCOPE_KEYS = [:controller, :action, :id]
+  
+  mattr_accessor :local_cache
     
   class << self
     #
