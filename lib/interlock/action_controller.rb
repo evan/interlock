@@ -69,7 +69,9 @@ module ActionController
       Interlock.local_cache = ActionController::Base::MemoryStore.new
       RAILS_DEFAULT_LOGGER.warn "** cleared interlock local cache"
     end    
-    before_filter :clear_interlock_local_cache
+    
+    # Should be registered first in the chain
+    prepend_before_filter :clear_interlock_local_cache 
   
   end
   
