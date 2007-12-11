@@ -5,9 +5,12 @@ lib/interlock/action_view.rb
 lib/interlock/active_record.rb
 lib/interlock/config.rb
 lib/interlock/core_extensions.rb
+lib/interlock/dispatcher.rb
 lib/interlock/interlock.rb
 lib/interlock/memcached.rb
+lib/interlock/rails.rb
 lib/interlock.rb
+LICENSE
 Manifest
 README
 test/integration/app/app/controllers/application.rb
