@@ -1,0 +1,3 @@
+
+* Test local cache clear in production and dev modes
+* Update tests for removal of "rendering" log item
