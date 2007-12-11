@@ -10,8 +10,6 @@ module ActionView::Helpers::CacheHelper
     key = controller.caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
     Interlock.register_dependencies(dependencies, key)
 
-    Interlock.say key, "is rendering" if RAILS_ENV == "development"
-    
     @controller.cache_erb_fragment(
       block, 
       key, 

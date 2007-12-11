@@ -5,7 +5,6 @@ lib/interlock/action_view.rb
 lib/interlock/active_record.rb
 lib/interlock/config.rb
 lib/interlock/core_extensions.rb
-lib/interlock/dispatcher.rb
 lib/interlock/interlock.rb
 lib/interlock/memcached.rb
 lib/interlock.rb
@@ -34,7 +33,6 @@ test/integration/app/config/initializers/mime_types.rb
 test/integration/app/config/memcached.yml
 test/integration/app/config/routes.rb
 test/integration/app/db/migrate/001_create_items.rb
-test/integration/app/db/schema.rb
 test/integration/app/doc/README_FOR_APP
 test/integration/app/public/404.html
 test/integration/app/public/422.html

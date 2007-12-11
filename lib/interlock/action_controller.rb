@@ -59,6 +59,17 @@ module ActionController
     end
     
     alias :caching :behavior_cache # XXX Deprecated
+
+    private
+
+    # 
+    # Callback to reset the local cache.
+    #
+    def clear_interlock_local_cache
+      Interlock.local_cache = ActionController::Base::MemoryStore.new
+      RAILS_DEFAULT_LOGGER.warn "** cleared interlock local cache"
+    end    
+    before_filter :clear_interlock_local_cache
   
   end
   
@@ -102,6 +113,5 @@ module ActionController
       end      
       
     end
-  end
-  
+  end    
 end
