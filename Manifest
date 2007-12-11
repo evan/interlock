@@ -8,7 +8,6 @@ lib/interlock/core_extensions.rb
 lib/interlock/dispatcher.rb
 lib/interlock/interlock.rb
 lib/interlock/memcached.rb
-lib/interlock/rails.rb
 lib/interlock.rb
 LICENSE
 Manifest
