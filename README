@@ -108,7 +108,7 @@ Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cach
   def profile
     @user = current_user
     behavior_cache :tag => @user do
-      @items = Item.find(:all, :conditions => "be slow")
+      @items = @user.items
     end
   end
 
