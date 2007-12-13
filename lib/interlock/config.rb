@@ -19,7 +19,7 @@ module Interlock
       #
       # Load the configuration file, if available, and then set up the Memcached instance,
       # Rails settings, and CACHE constants. Should be more or less compatible with
-      # cache_fu.
+      # Cache_fu.
       #
       def run!
         if File.exist?(CONFIG_FILE)
