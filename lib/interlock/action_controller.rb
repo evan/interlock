@@ -1,5 +1,5 @@
 
-module ActionController
+class ActionController #:nodoc:
   class Base
   
     #
@@ -40,8 +40,10 @@ module ActionController
       )
     end
     
+    #
     # Mark a controller block for caching. Accepts a list of class dependencies for
     # invalidation, as well as a :tag key for explicit fragment scoping.
+    #
     def behavior_cache(*args)  
       conventional_class = begin; controller_name.classify.constantize; rescue NameError; end
       options, dependencies = Interlock.extract_options_and_dependencies(args, conventional_class)
@@ -58,7 +60,9 @@ module ActionController
       end
     end
     
-    alias :caching :behavior_cache # XXX Deprecated
+    #:stopdoc:
+    alias :caching :behavior_cache # Deprecated
+    #:startdoc:
 
     private
 
@@ -75,12 +79,12 @@ module ActionController
   
   end
   
-  module Caching
+  module Caching #:nodoc:
     module Fragments
        
       #
       # Replaces Rail's write_fragment method. Avoids extra checks for regex keys, 
-      # which are unsupported; adds more detailed logging information, and stores 
+      # which are unsupported, adds more detailed logging information, and stores 
       # writes in the local process cache too to avoid duplicate memcached requests.
       #
       def write_fragment(key, content, options = nil)
@@ -96,7 +100,7 @@ module ActionController
 
       #
       # Replaces Rail's read_fragment method. Avoids checks for regex keys, 
-      # which are unsupported; adds more detailed logging information; and
+      # which are unsupported, adds more detailed logging information, and
       # checks the local process cache before hitting memcached. Hits on 
       # memcached are then stored back locally to avoid duplicate requests.
       #
@@ -109,7 +113,7 @@ module ActionController
           Interlock.say key, "read from memcached"
           Interlock.local_cache.write(key, content, options)
         else
-          Interlock.say key, "not found"
+          # Interlock.say key, "not found"
         end
         content
       end      

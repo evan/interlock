@@ -27,7 +27,6 @@ class ServerTest < Test::Unit::TestCase
   def test_caching
     browse("items")
     assert_match(/cleared interlock local cache/, log)
-    assert_match(/all:untagged not found/, log)
     assert_match(/all:untagged is running the controller block/, log)
     assert_match(/all:untagged wrote/, log)
     
@@ -35,18 +34,21 @@ class ServerTest < Test::Unit::TestCase
     browse("items")
     assert_match(/cleared interlock local cache/, log)
     assert_no_match(/all:untagged is running the controller block/, log)
+    assert_no_match(/all:untagged wrote/, log)
     assert_match(/all:untagged read from memcached/, log)
   end
   
   def test_broad_invalidation
     browse("items")
     assert_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged wrote/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(:first).save!")
     assert_match(/all:untagged invalidated by rule Item \-\> .all/, log)
     browse("items")
     assert_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged wrote/, log)
   end
 
   def test_narrow_invalidation
@@ -134,6 +136,8 @@ class ServerTest < Test::Unit::TestCase
   end
 
   def setup
+    # Yes, we test against an actual running server in order to lock down the environment
+    # class reloading situation
     @pid = Process.fork do
        Dir.chdir RAILS_ROOT do
          if $rcov

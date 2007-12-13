@@ -1,12 +1,14 @@
 
 module Interlock
 
-  mattr_accessor :config 
-  @@config = {
+  DEFAULTS = {
     :ttl => 1.day,
     :namespace => 'app',
     :servers => ['localhost:11211']
   }    
+
+  mattr_accessor :config 
+  @@config = DEFAULTS
   
   module Config
     

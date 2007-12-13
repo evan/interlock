@@ -1,4 +1,18 @@
 
+class Object
+  def to_interlock_tag
+    string = to_s
+    string = "empty_string" if string.empty? 
+    string.escape_tag_fragment
+  end
+end
+
+class NilClass
+  def to_interlock_tag
+    "untagged".escape_tag_fragment
+  end
+end
+
 class Hash
   alias :fetch_safely :[]
 
@@ -46,25 +60,5 @@ class String
   
   def escape_tag_fragment
     gsub(':', '-').gsub(/[^\w\d\-;]/, '_')
-  end
-end
-
-class Object
-  def to_interlock_tag
-    string = to_s
-    string = "empty_string" if string.empty? 
-    string.escape_tag_fragment
-  end
-end
-
-class NilClass
-  def to_interlock_tag
-    "untagged".escape_tag_fragment
-  end
-end
-
-class ActiveRecord::Base
-  def to_interlock_tag
-    "#{self.class.name}-#{self.id}".escape_tag_fragment
   end
 end

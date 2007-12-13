@@ -93,7 +93,7 @@ You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt
 
 Sometimes you need to cache multiple blocks in a controller, or otherwise get a more fine-grained scope. Interlock provides the <tt>:tag</tt> keypair for this purpose. <tt>:tag</tt> accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is converted to a string identifier. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
 
-Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache multiple copies of the same block for different action invocations. This is great for caching per-user, for example:
+Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache different versions of the same block, but differentiate based on params or other logic. This is great for caching per-user, for example:
 
   def profile
     @user = current_user

@@ -1,11 +1,11 @@
 
 module Interlock
 
-  class InterlockError < StandardError
+  class InterlockError < StandardError #:nodoc:
   end  
-  class DependencyError < InterlockError
+  class DependencyError < InterlockError #:nodoc:
   end  
-  class UsageError < InterlockError
+  class UsageError < InterlockError #:nodoc:
   end
   
   SCOPE_KEYS = [:controller, :action, :id]
@@ -17,7 +17,7 @@ module Interlock
     # Extract the dependencies from the rest of the arguments and registers
     # them with the appropriate models.
     # 
-    def extract_options_and_dependencies(dependencies, default = nil)
+    def extract_options_and_dependencies(dependencies, default = nil) 
       options = dependencies.extract_options!
       
       # Hook up the dependencies nested array.
@@ -82,7 +82,7 @@ module Interlock
     # Get the Memcached key for a class's dependency list. We store per-class 
     # to reduce lock contention.
     #
-    def dependency_key(klass) #:nodoc:
+    def dependency_key(klass) 
       "interlock:#{ENV['RAILS_ASSET_ID']}:dependency:#{klass.name}"
     end
     

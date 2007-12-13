@@ -1,6 +1,5 @@
 
 require 'echoe'
-require 'load_multi_rails_rake_tasks'
 
 Echoe.new("interlock") do |p|
   p.project = "fauna"
@@ -9,12 +8,8 @@ Echoe.new("interlock") do |p|
   p.docs_host = "blog.evanweaver.com:~/www/bax/public/files/doc/"  
   p.dependencies = "memcache_client >=1.5.0"
   p.test_pattern = ["test/integration/*.rb", "test/unit/*.rb"]
+  p.rdoc_pattern = ["README", "CHANGELOG", "TODO", "LICENSE", "lib/interlock/memcached.rb", "lib/interlock/interlock.rb", "lib/interlock/action_controller.rb", "lib/interlock/active_record.rb", "lib/interlock/action_view.rb", "lib/interlock/config.rb"]
 end
-
-task :setup do
-  Echoe.silence { system("ruby test/setup.rb") }
-end
-task :test => :setup 
 
 desc "Run all the tests in production and development mode both"
 task "test_all" do
