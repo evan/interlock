@@ -26,46 +26,44 @@ class ServerTest < Test::Unit::TestCase
   
   def test_caching
     browse("items")
+    assert_match(/cleared interlock local cache/, log)
+    assert_match(/all:untagged not found/, log)
     assert_match(/all:untagged is running the controller block/, log)
-    assert_match(/all:untagged is rendering/, log)
+    assert_match(/all:untagged wrote/, log)
+    
     truncate
     browse("items")
+    assert_match(/cleared interlock local cache/, log)
     assert_no_match(/all:untagged is running the controller block/, log)
-    assert_match(/all:untagged is rendering/, log)
     assert_match(/all:untagged read from memcached/, log)
   end
   
   def test_broad_invalidation
     browse("items")
     assert_match(/all:untagged is running the controller block/, log)
-    assert_match(/all:untagged is rendering/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(:first).save!")
     assert_match(/all:untagged invalidated by rule Item \-\> .all/, log)
     browse("items")
     assert_match(/all:untagged is running the controller block/, log)
-    assert_match(/all:untagged is rendering/, log)      
   end
 
   def test_narrow_invalidation
     browse("items/show/1")
     assert_match(/show:1:untagged is running the controller block/, log)
-    assert_match(/show:1:untagged is rendering/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(2).save!")
     assert_no_match(/show:1:untagged invalidated/, log)
     browse("items/show/1")
     assert_no_match(/show:1:untagged is running the controller block/, log)
-    assert_match(/show:1:untagged is rendering/, log)
     
     truncate
     assert_equal "true", remote_eval("Item.find(1).save!")
     assert_match(/show:1:untagged invalidated/, log)
     browse("items/show/1")
     assert_match(/show:1:untagged is running the controller block/, log)
-    assert_match(/show:1:untagged is rendering/, log)
   end
   
   def test_caching_with_tag
@@ -91,19 +89,16 @@ class ServerTest < Test::Unit::TestCase
   def test_caching_with_ignore
     assert_match(/Delicious cake/, browse('items'))
     assert_match(/any:any:all:related is running the controller block/, log)
-    assert_match(/any:any:all:related is rendering/, log)
     
     truncate
     assert_match(/Delicious cake/, browse("items/show/2"))
     assert_no_match(/any:any:all:related is running the controller block/, log)
-    assert_match(/any:any:all:related is rendering/, log)
 
     truncate
     remote_eval("Item.find(1).save!")
     assert_match(/Delicious cake/, browse("items/show/2"))
     assert_match(/any:any:all:related invalidated/, log)
     assert_match(/any:any:all:related is running the controller block/, log)
-    assert_match(/any:any:all:related is rendering/, log)
   end
   
   
