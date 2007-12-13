@@ -47,7 +47,7 @@ Now you're ready to go.
  
 == Usage
 
-Interlock provides two similar caching methods: <tt>behavior_cache</tt> for controllers and <tt>view_cache</tt> for views. The both accept an optional list or hash of model dependencies, and an optional <tt>:tag</tt> keypair. <tt>view_cache</tt> also accepts a <tt>ttl</tt>.
+Interlock provides two similar caching methods: <tt>behavior_cache</tt> for controllers and <tt>view_cache</tt> for views. They both accept an optional list or hash of model dependencies, and an optional <tt>:tag</tt> keypair. <tt>view_cache</tt> also accepts a <tt>:ttl</tt> keypair.
 
 The simplest usage doesn't require any parameters. In the controller:
 
