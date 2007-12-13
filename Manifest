@@ -33,6 +33,16 @@ test/integration/app/config/initializers/inflections.rb
 test/integration/app/config/initializers/mime_types.rb
 test/integration/app/config/memcached.yml
 test/integration/app/config/routes.rb
+test/integration/app/coverage/cache-43041
+test/integration/app/coverage/index.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-action_controller_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-action_view_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-active_record_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-config_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-core_extensions_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-interlock_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-memcached_rb.html
+test/integration/app/coverage/vendor-plugins-interlock-lib-interlock_rb.html
 test/integration/app/db/migrate/001_create_items.rb
 test/integration/app/db/schema.rb
 test/integration/app/doc/README_FOR_APP

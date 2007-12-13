@@ -16,7 +16,7 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 == What it does
 
-Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run. This eliminates duplicate effort from your request cycle. Your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
+Interlock makes your view fragments and associated controller blocks march along together. If a fragment is fresh, the controller behavior won't run. This eliminates duplicate effort from your request cycle. Your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
 
 Interlock automatically tracks invalidation dependencies based on the model lifecyle, and supports arbitrary levels of  scoping per-block.
 
@@ -30,7 +30,7 @@ You also need the <tt>memcache-client</tt> gem:
 Then, install the plugin:
   script/plugin install -x svn://rubyforge.org/var/svn/fauna/interlock/trunk
   
-Lastly, configure your Rails app for memcached by creating a <tt>config/memcached.yml</tt>. The format is compatible with Cache_fu:
+Lastly, configure your Rails app for memcached by creating a <tt>config/memcached.yml</tt> file. The format is compatible with Cache_fu:
 
   defaults:
     namespace: myapp
@@ -51,7 +51,7 @@ Interlock provides two similar caching methods: <tt>behavior_cache</tt> for cont
 
 The simplest usage doesn't require any parameters. In the controller:
 
-  class ItemController < ActionController::Base
+  class ItemsController < ActionController::Base
   
     def slow_action
       behavior_cache do
@@ -61,9 +61,21 @@ The simplest usage doesn't require any parameters. In the controller:
     
   end
   
-Now, in the view, wrap the associated ERB template block in a <tt>view_cache</tt> method.
+Now, in the view, wrap the largest section of ERB you can find that uses data from <tt>@items</tt> (but not from any other instance variables) in a <tt>view_cache</tt> block. 
 
-You've now automatically registered a caching dependency on Item for <tt>slow_action</tt>. The controller block won't run if the <tt>slow_action</tt> view cache is fresh, and the view cache will only get invalidated when an Item is changed.
+  <% @title = "My Sweet Items" %>
+
+  <% view_cache do %>
+    <% @items.each do |item| %>
+      <h1><%= item.name %></h1>
+    <% end %>
+  <% end %>
+  
+You have to do them both.
+
+This automatically registers a caching dependency on Item for <tt>slow_action</tt>. The controller block won't run if the <tt>slow_action</tt> view fragment is fresh, and the view fragment will only get invalidated when an Item is changed. 
+
+You can use multiple instance variables in one block, of course. Just make sure the <tt>behavior_cache</tt> provides whatever the <tt>view_cache</tt> uses.
 
 == Declaring dependencies
 
