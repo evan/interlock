@@ -1,3 +1,4 @@
 
+* Test and document whether you can safely nest view_cache blocks
 * Figure out how to cache Builder blocks
 * Figure out how to cache RJS

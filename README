@@ -61,7 +61,7 @@ The simplest usage doesn't require any parameters. In the controller:
     
   end
   
-Now, in the view, wrap the largest section of ERB you can find that uses data from <tt>@items</tt> (but not from any other instance variables) in a <tt>view_cache</tt> block. 
+Now, in the view, wrap the largest section of ERB you can find that uses data from <tt>@items</tt> in a <tt>view_cache</tt> block. No other part of the view can refer to <tt>@items</tt>, because <tt>@items</tt> won't get set unless the cache is stale.
 
   <% @title = "My Sweet Items" %>
 
