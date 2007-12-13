@@ -17,6 +17,7 @@ class ServerTest < Test::Unit::TestCase
     Dir.mkdir COVERAGE
   end
   
+  
   ### Tests
   
   def test_render
@@ -105,8 +106,30 @@ class ServerTest < Test::Unit::TestCase
   
   
   ### Support methods
+
+  def setup
+    # We test against an actual running server in order to lock down the environment
+    # class reloading situation
+    Process.fork do
+       Dir.chdir RAILS_ROOT do
+         if $rcov
+           exec("rcov --aggregate #{RCOV} --exclude config\/.*,app\/.*,boot\/.*,script\/server --include-file vendor\/plugins\/interlock\/lib\/.*\.rb script/server -- -p #{PORT} &> #{LOG}")
+         else
+           exec("script/server -p #{PORT} &> #{LOG}")
+         end
+       end
+     end
+     sleep(0.2) while log !~ /available at 0.0.0.0.#{PORT}/
+     truncate
+  end
   
-  private
+  def teardown
+    # Process.kill(9, pid) doesn't work because Mongrel has double-forked itself away    
+    while (pids = `ps awx | grep #{PORT} | grep -v grep | awk '{print $1}'`.split("\n")).any?
+      pids.each {|pid| system("kill #{pid}")}
+      sleep(0.2)
+    end
+  end   
   
   def truncate
     system("> #{LOG}")
@@ -134,31 +157,5 @@ class ServerTest < Test::Unit::TestCase
     # Server doesn't run in our process, so invalidations here don't affect it    
     browse("eval?string=#{CGI.escape(string)}")
   end
-
-  def setup
-    # Yes, we test against an actual running server in order to lock down the environment
-    # class reloading situation
-    @pid = Process.fork do
-       Dir.chdir RAILS_ROOT do
-         if $rcov
-           exec("rcov --aggregate #{RCOV} --exclude config\/.*,app\/.*,boot\/.*,script\/server --include-file vendor\/plugins\/interlock\/lib\/.*\.rb script/server -- -p #{PORT} &> #{LOG}")
-         else
-           exec("script/server -p #{PORT} &> #{LOG}")
-         end
-       end
-     end
-     sleep(0.2) while log !~ /available at 0.0.0.0.#{PORT}/
-     truncate
-  end
-  
-  def teardown
-    # Process.kill(9, @pid) doesn't work because Mongrel has double-forked itself away    
-    while (pids = `ps awx | grep #{PORT} | grep -v grep | awk '{print $1}'`.split("\n")).any?
-      pids.each {|pid| system("kill #{pid}")}
-      sleep(0.2)
-    end
-    # print "K"
-    @pid = nil
-  end  
   
 end

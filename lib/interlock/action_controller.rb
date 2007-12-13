@@ -1,5 +1,5 @@
 
-class ActionController #:nodoc:
+module ActionController #:nodoc:
   class Base
   
     #

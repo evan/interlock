@@ -22,4 +22,4 @@ Rails::Initializer.run do |config|
   
 end
 
-ENV['RAILS_ASSET_ID'] = Time.now.to_i.to_s
+ENV['RAILS_ASSET_ID'] = rand.to_s

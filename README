@@ -1,7 +1,7 @@
 
 Interlock
 
-An optimal efficiency caching plugin for Rails.
+An optimal-efficiency caching plugin for Rails.
 
 == License
 
@@ -11,20 +11,18 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 == Requirements
 
-* Memcached
+* Memcached (http://www.danga.com/memcached)
 * memcache-client gem
 
-== Features
+== What it does
 
-Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run. This eliminates duplicate effort from your request cycle. 
+Interlock makes your fragment and controller blocks march along together. If a fragment is fresh, the associated controller behavior won't run. This eliminates duplicate effort from your request cycle. Your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
 
-It also means that your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
-
-Interlock also automatically registers invalidation dependencies based on the model lifecyle, and supports fragment scoping based on arbitrary objects.
+Interlock automatically tracks invalidation dependencies based on the model lifecyle, and supports arbitrary levels of  scoping per-block.
 
 == Installation
   
-First, compile and install memcached itself. Get a memcached server running on some port.
+First, compile and install memcached itself. Get a memcached server running.
 
 You also need the <tt>memcache-client</tt> gem:
   sudo gem install memcache-client
@@ -39,7 +37,7 @@ Lastly, configure your Rails app for memcached by creating a <tt>config/memcache
     sessions: false
   development:
     servers: 
-      - localhost:11211
+      - localhost:11211 # Default port
   production:
     servers
       - 10.12.128.1
@@ -87,13 +85,13 @@ You can declare non-default invalidation dependencies by passing models to <tt>b
   behavior_cache Item => :id do
   end
 
-You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt>view_cache</tt> even for the same action. The set union of both dependencies lists will be used.
+You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt>view_cache</tt> even for the same action. The set union of both dependency lists will be used.
 
 == Narrowing scope and caching multiple blocks
 
-Sometimes you need to cache multiple blocks in a controller, or otherwise get a more fine-grained scope. Interlock provides the <tt>:tag</tt> keypair for this purpose. <tt>:tag</tt> accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is converted to a string identifier. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
+Sometimes you need to cache multiple blocks in a controller, or otherwise get a more fine-grained scope. Interlock provides the <tt>:tag</tt> key for this purpose. <tt>:tag</tt> accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is converted to a string identifier. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
 
-Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache different versions of the same block, but differentiate based on params or other logic. This is great for caching per-user, for example:
+Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache different versions of the same block, differentiating based on params or other logic. This is great for caching per-user, for example:
 
   def profile
     @user = current_user
@@ -102,7 +100,7 @@ Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cach
     end
   end
 
-In the view, use the same tag value (<tt>@user</tt>). Note that <tt>@user</tt> must be set outside of the behavior block in the controller, because its contents are used to decide whether to run the block in the first place.
+In the view, use the same <tt>:tag</tt> value (<tt>@user</tt>). Note that <tt>@user</tt> must be set outside of the behavior block in the controller, because its contents are used to decide whether to run the block in the first place.
 
 This way each user will see only their own cache. Pretty neat.
 
