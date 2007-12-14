@@ -161,6 +161,11 @@ You can write custom invalidation rules if you really want to, but try hard to a
 
 Also, Interlock obeys the <tt>ENV['RAILS_ASSET_ID']</tt> setting, so if you need to blanket-invalidate all your caches, just change <tt>RAILS_ASSET_ID</tt> (for example, you could have it increment on every deploy).
 
+== Further resources
+
+* http://blog.evanweaver.com/articles/2007/12/13/better-rails-caching/
+* http://www.socialtext.net/memcached/index.cgi?faq
+
 == Reporting problems
 
 * http://rubyforge.org/forum/forum.php?forum_id=19835
