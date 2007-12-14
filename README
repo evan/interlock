@@ -163,6 +163,6 @@ Also, Interlock obeys the <tt>ENV['RAILS_ASSET_ID']</tt> setting, so if you need
 
 == Reporting problems
 
-* http://rubyforge.org/forum/forum.php?forum_id=18926
+* http://rubyforge.org/forum/forum.php?forum_id=19835
 
 Patches and contributions are very welcome. Please note that contributors are required to assign copyright for their additions to Cloudburst, LLC. 
