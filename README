@@ -11,7 +11,7 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 == Requirements
 
-* Memcached (http://www.danga.com/memcached)
+* memcached (http://www.danga.com/memcached)
 * memcache-client gem
 
 == What it does
