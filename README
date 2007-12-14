@@ -1,7 +1,7 @@
 
 Interlock
 
-A high-efficiency caching plugin for Rails.
+A rails plugin for maintainable and high-efficiency caching.
 
 == License
 
