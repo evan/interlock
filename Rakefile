@@ -3,7 +3,7 @@ require 'echoe'
 
 Echoe.new("interlock") do |p|
   p.project = "fauna"
-  p.summary = "A rails plugin for maintainable and high-efficiency caching."
+  p.summary = "A Rails plugin for maintainable and high-efficiency caching."
   p.url = "http://blog.evanweaver.com/files/doc/fauna/interlock/"  
   p.docs_host = "blog.evanweaver.com:~/www/bax/public/files/doc/"  
   p.dependencies = "memcache_client >=1.5.0"
