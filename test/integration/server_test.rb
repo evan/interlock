@@ -87,7 +87,16 @@ class ServerTest < Test::Unit::TestCase
     remote_eval("Item.find(1).save!")
     assert_match(/Artichoke/, browse("items/recent?seconds=3"))
     assert_match(/recent:all:3 is running the controller block/, log)
-  end  
+  end
+  
+  def test_caching_with_perform_false    
+    browse("items/preview/1")
+    assert_match(/preview:1:untagged is running the controller block/, log)    
+    
+    truncate
+    browse("items/preview/1")
+    assert_match(/preview:1:untagged is running the controller block/, log)        
+  end
   
   def test_caching_with_ignore
     assert_match(/Delicious cake/, browse('items'))

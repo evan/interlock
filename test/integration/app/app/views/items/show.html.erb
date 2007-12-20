@@ -1,6 +1,6 @@
 
 <h1>Show</h1>
-<% view_cache Item => :id do %>
+<% view_cache Item => :id, :perform => @perform do %>
     <h3><%= @item.name %></h3>
     <p><%= @item.description %></p>
 <% end %>

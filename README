@@ -77,74 +77,9 @@ This automatically registers a caching dependency on Item for <tt>slow_action</t
 
 You can use multiple instance variables in one block, of course. Just make sure the <tt>behavior_cache</tt> provides whatever the <tt>view_cache</tt> uses.
 
-== Declaring dependencies
+See ActionController::Base and ActionView::Helpers::CacheHelper for more details.
 
-You can declare non-default invalidation dependencies by passing models to <tt>behavior_cache</tt> (you can also pass them to <tt>view_cache</tt>, but you should only do that if you are caching a fragment without an associated behavior block in the controller).
-
-<b>No dependencies (cache never invalidates):</b>
-  behavior_cache nil do
-  end
-  
-<b>Invalidate on any Media change:</b>
-  behavior_cache Media do
-  end
-  
-<b>Invalidate on any Media or Item change:</b>
-  behavior_cache Media, Item do
-  end
-  
-<b>Invalidate on Item changes if the Item <tt>id</tt> matches the current <tt>params[:id]</tt> value:</b>
-  behavior_cache Item => :id do
-  end
-
-You do not have to pass the same dependencies to <tt>behavior_cache</tt> and <tt>view_cache</tt> even for the same action. The set union of both dependency lists will be used.
-
-== Narrowing scope and caching multiple blocks
-
-Sometimes you need to cache multiple blocks in a controller, or otherwise get a more fine-grained scope. Interlock provides the <tt>:tag</tt> key for this purpose. <tt>:tag</tt> accepts either an array of symbols, which are mapped to <tt>params</tt> values, or an arbitrary object, which is converted to a string identifier. <b>Your corresponding behavior caches and view caches must have identical <tt>:tag</tt> values for the interlocking to take effect.</b>
-
-Note that <tt>:tag</tt> can be used to scope caches. You can simultaneously cache different versions of the same block, differentiating based on params or other logic. This is great for caching per-user, for example:
-
-  def profile
-    @user = current_user
-    behavior_cache :tag => @user do
-      @items = @user.items
-    end
-  end
-
-In the view, use the same <tt>:tag</tt> value (<tt>@user</tt>). Note that <tt>@user</tt> must be set outside of the behavior block in the controller, because its contents are used to decide whether to run the block in the first place.
-
-This way each user will see only their own cache. Pretty neat.
-
-== Broadening scope
-
-Sometimes the default scope (<tt>controller</tt>, <tt>action</tt>, <tt>params[:id]</tt>) is too narrow. For example, you might share a partial across actions, and set up its data via a filter. By default, Interlock will cache a separate version of it for each action. To avoid this, you can use the <tt>:ignore</tt> key, which lets you list parts of the default scope to ignore:
-
-  before_filter :recent
-  
-  private
-  
-  def recent
-    behavior_cache :ignore => :action do
-      @recent = Item.find(:all, :limit => 5, :order => 'updated_at DESC')
-    end
-  end
-
-Valid values for <tt>:ignore</tt> are <tt>:controller</tt>, <tt>:action</tt>, <tt>:id</tt>, and <tt>:all</tt>. You can pass an array of multiple values. <b>Just like with <tt>:tag</tt>, your corresponding behavior caches and view caches must have identical <tt>:ignore</tt> values.</b> Note that cache blocks with <tt>:ignore</tt> values still obey the regular invalidation rules.
-
-A good way to get started is to just use the default scope. Then <tt>grep</tt> in the production log for <tt>interlock</tt> and see what keys are being set and read. If you see lots of different keys go by for data that you know is the same, then set some <tt>:ignore</tt> values. 
-
-== View-only caching
-
-It's fine to use a <tt>view_cache</tt> block without a <tt>behavior_cache</tt> block. For example, to mimic regular fragment cache behavior, but take advantage of Memcached's <tt>:ttl</tt> support, call:
-
-  <% view_cache nil, :ignore => :all, :tag => 'sidebar', :ttl => 5.minutes %>
-    <h1>On the side</h1>
-  <% end %> 
-  
-Remember that <tt>nil</tt> disables invalidation rules. This is a nice trick for keeping your caching strategy unified.
-
-== Gotchas
+== Notes
 
 You will not see any actual cache reuse in development mode unless you set <tt>config.action_controller.perform_caching = true</tt> in <tt>config/environments/development.rb</tt>.
 

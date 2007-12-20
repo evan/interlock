@@ -21,6 +21,14 @@ class ItemsController < ApplicationController
     end
   end
   
+  def preview
+    @perform = false
+    behavior_cache Item => :id, :perform => @perform do
+      @item = Item.find(params['id'])
+    end
+    render :action => 'show'
+  end
+  
   private
   
   def related
@@ -28,5 +36,5 @@ class ItemsController < ApplicationController
       @related = "Delicious cake"
     end
   end
-  
+    
 end
