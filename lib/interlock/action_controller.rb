@@ -40,7 +40,7 @@ If you pass an Array of symbols as the tag, it will get value-mapped onto params
     
 <tt>behavior_cache</tt> marks a controller block for caching. It accepts a list of class dependencies for invalidation, as well as as <tt>:tag</tt> and <tt>:ignore</tt> keys for explicit fragment scoping. It does not accept a <tt>:ttl</tt> key.
 
-Please note that the behavior of nested <tt>behavior_cache</tt> blocks is undefined, unlike nested <tt>view_cache</tt> blocks, which work fine.
+Please note that the behavior of nested <tt>behavior_cache</tt> blocks is undefined.
 
 == Declaring dependencies
 
@@ -162,9 +162,10 @@ And in the <tt>show.html.erb</tt> view:
     module Fragments
        
       #
-      # Replaces Rail's write_fragment method. Avoids extra checks for regex keys, 
-      # which are unsupported, adds more detailed logging information, and stores 
-      # writes in the local process cache too to avoid duplicate memcached requests.
+      # Replaces Rail's write_fragment method. Avoids extra checks for regex keys 
+      # which are unsupported, adds more detailed logging information, stores writes 
+      # in the local process cache too to avoid duplicate memcached requests, and
+      # includes the content_for cache in the fragment.
       #
       def write_fragment(key, block_content, options = nil)
         return unless perform_caching
@@ -181,9 +182,10 @@ And in the <tt>show.html.erb</tt> view:
 
       #
       # Replaces Rail's read_fragment method. Avoids checks for regex keys, 
-      # which are unsupported, adds more detailed logging information, and
-      # checks the local process cache before hitting memcached. Hits on 
-      # memcached are then stored back locally to avoid duplicate requests.
+      # which are unsupported, adds more detailed logging information, checks 
+      # the local process cache before hitting memcached, and restores the
+      # content_for cache. Hits on memcached are also stored back locally to 
+      # avoid duplicate requests.
       #
       def read_fragment(key, options = nil)
         return unless perform_caching

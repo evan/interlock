@@ -15,7 +15,7 @@ You can specify dependencies in <tt>view_cache</tt> if you really want to. Note 
 
 Nested <tt>view_cache</tt> blocks work fine. You would only need to nest if you had a slowly invalidating block contained in a more quickly invalidating block; otherwise there's no benefit.
 
-Finally, caching <tt>content_for</tt> works, unlike regular Rails. It even works in nested caches.
+Finally, caching <tt>content_for</tt> within a <tt>view_cache</tt> works, unlike regular Rails. It even works in nested caches.
 
 == Setting a TTL
 
