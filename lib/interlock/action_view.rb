@@ -17,14 +17,14 @@ Nested <tt>view_cache</tt> blocks work fine. You would only need to nest if you 
 
 Finally, caching <tt>content_for</tt> works, unlike regular Rails. It even works in nested caches.
 
-== TTL
+== Setting a TTL
 
 Use the <tt>:ttl</tt> key to specify a maximum time-to-live, in seconds:
 
   <% view_cache :ttl => 5.minutes do %>
   <% end %>
 
-Note that the cache is not guaranteed to persist this long. An invalidation rule could trigger first, or memcached could eject the item early due to the LRU.
+Note that the cached item is not guaranteed to live this long. An invalidation rule could trigger first, or memcached could eject the item early due to the LRU.
 
 == View caching without action caching
 
