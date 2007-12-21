@@ -40,6 +40,8 @@ If you pass an Array of symbols as the tag, it will get value-mapped onto params
     
 <tt>behavior_cache</tt> marks a controller block for caching. It accepts a list of class dependencies for invalidation, as well as as <tt>:tag</tt> and <tt>:ignore</tt> keys for explicit fragment scoping. It does not accept a <tt>:ttl</tt> key.
 
+Please note that the behavior of nested <tt>behavior_cache</tt> blocks is undefined, unlike nested <tt>view_cache</tt> blocks, which work fine.
+
 == Declaring dependencies
 
 You can declare non-default invalidation dependencies by passing models to <tt>behavior_cache</tt> (you can also pass them to <tt>view_cache</tt>, but you should only do that if you are caching a fragment without an associated behavior block in the controller).
@@ -202,10 +204,8 @@ And in the <tt>show.html.erb</tt> view:
         unless options[:assign_content_for] == false
           # Extract content_for variables
           content.last.each do |name, value| 
-            # Make sure to append, not overwrite
-            existing_content = @template.instance_variable_get(name)
-            @template.instance_variable_set(name, "#{existing_content}#{value}")
-            Interlock.say key, "set #{name} as #{value.inspect}"
+            # We'll just call the helper because that will handle nested view_caches properly.
+            @template.send(:content_for, name, value)
           end
         end
 

@@ -70,7 +70,8 @@ class ServerTest < Test::Unit::TestCase
   end
   
   def test_caching_with_tag
-    sleep(3)
+    # This test is a little over-complicated
+    sleep(4)
     assert_no_match(/Artichoke/, browse("items/recent?seconds=3"))
     assert_match(/recent:all:3 is running the controller block/, log)
 
@@ -80,13 +81,13 @@ class ServerTest < Test::Unit::TestCase
     assert_no_match(/recent:all:3 is running the controller block/, log)
     
     truncate
-    assert_no_match(/Artichoke/, browse("items/recent?seconds=3"))
-    assert_no_match(/recent:all:3 is running the controller block/, log)
-    
-    truncate
     remote_eval("Item.find(1).save!")
-    assert_match(/Artichoke/, browse("items/recent?seconds=3"))
-    assert_match(/recent:all:3 is running the controller block/, log)
+    assert_match(/Artichoke/, browse("items/recent?seconds=4"))
+    assert_match(/recent:all:4 is running the controller block/, log)
+
+    truncate
+    assert_no_match(/Artichoke/, browse("items/recent?seconds=3"))
+    assert_no_match(/recent:all:3 is running the controller block/, log)    
   end
   
   def test_caching_with_perform_false    
@@ -122,9 +123,34 @@ class ServerTest < Test::Unit::TestCase
     
     truncate
     assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
+    # Make sure we didn't copy the content_for too many times
+    assert_no_match(/Interlock Test:\s*\d\s*Items\s*\d\s*Items/m, browse("items"))
     assert_no_match(/all:untagged is running the controller block/, log)
     assert_match(/all:untagged read from memcached/, log)
   end  
+  
+  def test_nested_view_caches
+    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+    assert_match(/detail:1:outer is running the controller block/, log)
+    assert_match(/detail:1:inner is running the controller block/, log)
+    
+    truncate
+    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+    assert_no_match(/detail:1:outer is running the controller block/, log)
+    assert_no_match(/detail:1:inner is running the controller block/, log)
+
+    truncate
+    remote_eval("Item.find(2).save!")
+    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+    assert_match(/detail:1:outer is running the controller block/, log)
+    assert_no_match(/detail:1:inner is running the controller block/, log)
+
+    truncate
+    remote_eval("Item.find(1).save!")
+    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+    assert_match(/detail:1:outer is running the controller block/, log)
+    assert_match(/detail:1:inner is running the controller block/, log)    
+  end
   
   ### Support methods
 

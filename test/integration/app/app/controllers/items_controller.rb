@@ -9,6 +9,16 @@ class ItemsController < ApplicationController
     render :action => 'list'
   end
   
+  def detail
+    # Nesting is theoretically useful when the outer view block invalidates faster than the inner one
+    behavior_cache :tag => :outer do
+      @items = Item.find(:all)
+    end
+    behavior_cache Item => :id, :tag => :inner do
+      @item = Item.find(params[:id])
+    end
+  end
+  
   def show
     behavior_cache Item => :id do
       @item = Item.find(params['id'])

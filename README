@@ -18,7 +18,7 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 Interlock makes your view fragments and associated controller blocks march along together. If a fragment is fresh, the controller behavior won't run. This eliminates duplicate effort from your request cycle. Your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
 
-Interlock automatically tracks invalidation dependencies based on the model lifecyle, and supports arbitrary levels of  scoping per-block.
+Interlock automatically tracks invalidation dependencies based on the model lifecyle, and supports arbitrary levels of scoping per-block. It also caches <tt>content_for</tt> calls, unlike regular Rails.
 
 == Installation
   
