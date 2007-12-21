@@ -91,11 +91,13 @@ class ServerTest < Test::Unit::TestCase
   
   def test_caching_with_perform_false    
     browse("items/preview/1")
-    assert_match(/preview:1:untagged is running the controller block/, log)    
+    assert_no_match(/preview:1:untagged registered a dependency/, log)
+    assert_match(/preview:1:untagged is not cached/, log)
     
     truncate
     browse("items/preview/1")
-    assert_match(/preview:1:untagged is running the controller block/, log)        
+    assert_no_match(/preview:1:untagged registered a dependency/, log)
+    assert_match(/preview:1:untagged is not cached/, log)        
   end
   
   def test_caching_with_ignore
@@ -113,6 +115,16 @@ class ServerTest < Test::Unit::TestCase
     assert_match(/any:any:all:related is running the controller block/, log)
   end
   
+  def test_caching_of_content_for
+    assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
+    assert_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged wrote/, log)
+    
+    truncate
+    assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
+    assert_no_match(/all:untagged is running the controller block/, log)
+    assert_match(/all:untagged read from memcached/, log)
+  end  
   
   ### Support methods
 

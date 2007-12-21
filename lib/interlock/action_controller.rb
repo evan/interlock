@@ -120,14 +120,20 @@ And in the <tt>show.html.erb</tt> view:
       options, dependencies = Interlock.extract_options_and_dependencies(args, conventional_class)
       
       raise UsageError, ":ttl has no effect in a behavior_cache block" if options[:ttl]
-      
+
       key = caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
-      Interlock.register_dependencies(dependencies, key)
-          
-      # See if the fragment exists, and run the block if it doesn't.
-      if !read_fragment(key) or options[:perform] == false
-        Interlock.say key, "is running the controller block"
+
+      if options[:perform] == false
+        Interlock.say key, "is not cached"
         yield
+      else
+        Interlock.register_dependencies(dependencies, key)
+            
+        # See if the fragment exists, and run the block if it doesn't.
+        unless read_fragment(key, :assign_content_for => false)
+          Interlock.say key, "is running the controller block"
+          yield
+        end
       end
     end
     
@@ -158,15 +164,17 @@ And in the <tt>show.html.erb</tt> view:
       # which are unsupported, adds more detailed logging information, and stores 
       # writes in the local process cache too to avoid duplicate memcached requests.
       #
-      def write_fragment(key, content, options = nil)
+      def write_fragment(key, block_content, options = nil)
         return unless perform_caching
+        
+        content = [block_content, @template.cached_content_for]
 
         fragment_cache_store.write(key, content, options)
         Interlock.local_cache.write(key, content, options)
 
         Interlock.say key, "wrote"
 
-        content
+        block_content
       end
 
       #
@@ -185,8 +193,23 @@ And in the <tt>show.html.erb</tt> view:
           Interlock.local_cache.write(key, content, options)
         else
           # Interlock.say key, "not found"
+          return nil
         end
-        content
+        
+        raise Interlock::FragmentError "Fragment #{key} was not set by Interlock" unless content.is_a? Array
+
+        options ||= {}
+        unless options[:assign_content_for] == false
+          # Extract content_for variables
+          content.last.each do |name, value| 
+            # Make sure to append, not overwrite
+            existing_content = @template.instance_variable_get(name)
+            @template.instance_variable_set(name, "#{existing_content}#{value}")
+            Interlock.say key, "set #{name} as #{value.inspect}"
+          end
+        end
+
+        content.first        
       end      
       
     end

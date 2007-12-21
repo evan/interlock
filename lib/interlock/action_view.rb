@@ -1,5 +1,9 @@
 
 module ActionView #:nodoc:
+  class Base #:nodoc:
+    attr_accessor :cached_content_for
+  end
+
   module Helpers #:nodoc:
     module CacheHelper 
      
@@ -32,22 +36,27 @@ Remember that <tt>nil</tt> disables invalidation rules. This is a nice trick for
 See ActionController::Base for explanations of the rest of the options. The <tt>view_cache</tt> and <tt>behavior_cache</tt> APIs are identical except for setting the <tt>:ttl</tt>, which can only be done in the view.
 
 =end     
-     def view_cache(*args, &block)
+     def view_cache(*args, &block)       
        conventional_class = begin; controller.controller_name.classify.constantize; rescue NameError; end
        options, dependencies = Interlock.extract_options_and_dependencies(args, conventional_class)  
-       
+
        key = controller.caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
-       Interlock.register_dependencies(dependencies, key)
        
-       # Interlock.say key "is rendering"
-       unless options[:perform] == false
+       if options[:perform] == false
+         # Interlock.say key, "is not cached"
+         block.call
+       else       
+         Interlock.register_dependencies(dependencies, key)
+
+         # Interlock.say key, "is rendering"
+
+         @cached_content_for = {}
          @controller.cache_erb_fragment(
            block, 
            key, 
            :ttl => (options.value_for_indifferent_key(:ttl) or Interlock.config[:ttl])
          )
-       else
-         block.call
+         @cached_content_for = nil
        end
      end
      
@@ -56,5 +65,25 @@ See ActionController::Base for explanations of the rest of the options. The <tt>
     #:startdoc:
      
     end
+
+  
+    module CaptureHelper
+      #
+      # Override content_for so we can cache the instance variables it sets along with the fragment.
+      #
+      def content_for(name, content = nil, &block)
+        name = "@content_for_#{name}"
+        existing_content = instance_variable_get(name).to_s
+        this_content = (block_given? ? capture(&block) : content)
+        
+        # If we are in a view_cache block, cache what we added to this instance variable
+        if @cached_content_for
+          @cached_content_for[name] = "#{@cached_content_for[name]}#{this_content}"
+        end
+        
+        instance_variable_set(name, existing_content + this_content)
+      end    
+    end
+
   end
 end

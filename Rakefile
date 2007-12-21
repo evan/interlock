@@ -20,3 +20,8 @@ task "test_all" do
   STDERR.puts "#{'='*80}\nProduction mode\n#{'='*80}"
   system("rake test:multi_rails:all")
 end
+
+task "tail" do
+  log = "test/integration/app/log/development.log"
+  system("touch #{log} && tail -f #{log} | grep interlock")
+end
