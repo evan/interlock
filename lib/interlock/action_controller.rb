@@ -193,17 +193,20 @@ And in the <tt>show.html.erb</tt> view:
         if content = Interlock.local_cache.read(key, options)
           # Interlock.say key, "read from local cache"
         elsif content = fragment_cache_store.read(key, options)            
-          Interlock.say key, "read from memcached"
-          Interlock.local_cache.write(key, content, options)
+          unless content.is_a? Array
+            Interlock.say key, "has an incompatible type"
+            return
+          else
+            Interlock.say key, "read from memcached"
+            Interlock.local_cache.write(key, content, options)
+          end
         else
-          # Interlock.say key, "not found"
-          return nil
+          return # Not found
         end
-        
-        raise Interlock::FragmentError "Fragment #{key} was not set by Interlock" unless content.is_a? Array
 
         options ||= {}
-        unless options[:assign_content_for] == false
+        # Note that 'nil' is considered true for :assign_content_for
+        if options[:assign_content_for] != false and content.last 
           # Extract content_for variables
           content.last.each do |name, value| 
             # We'll just call the helper because that will handle nested view_caches properly.
