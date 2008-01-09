@@ -7,7 +7,7 @@ module Interlock
   end  
   class UsageError < InterlockError #:nodoc:
   end
-  class FragmentError < InterlockError #:nodoc:
+  class FragmentConsistencyError < InterlockError #:nodoc:
   end
   
   SCOPE_KEYS = [:controller, :action, :id]

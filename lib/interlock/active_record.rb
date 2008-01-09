@@ -14,7 +14,7 @@ module ActiveRecord #:nodoc:
     #
     
     def expire_interlock_keys
-      (CACHE.get(Interlock.dependency_key(self.class)) || {}).each do |key, scope|
+      (CACHE.get(Interlock.dependency_key(self.class.base_class)) || {}).each do |key, scope|
         if scope == :all or (scope == :id and key.field(4) == self.to_param.to_s)
           Interlock.say key, "invalidated by rule #{self.class} -> #{scope.inspect}."
           Interlock.invalidate key

@@ -9,6 +9,8 @@ Echoe.new("interlock") do |p|
   p.dependencies = "memcache_client >=1.5.0"
   p.test_pattern = ["test/integration/*.rb", "test/unit/*.rb"]
   p.rdoc_pattern = ["README", "CHANGELOG", "TODO", "LICENSE", "lib/interlock/memcached.rb", "lib/interlock/interlock.rb", "lib/interlock/action_controller.rb", "lib/interlock/active_record.rb", "lib/interlock/action_view.rb", "lib/interlock/config.rb"]
+  p.clean_pattern += ['test/integration/app/coverage', 'test/integration/app/db/schema.rb',
+                      'test/integration/app/vendor/plugins/interlock']
 end
 
 desc "Run all the tests in production and development mode both"
