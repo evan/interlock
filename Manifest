@@ -12,6 +12,7 @@ lib/interlock.rb
 LICENSE
 Manifest
 README
+tasks/interlock.rake
 test/integration/app/app/controllers/application.rb
 test/integration/app/app/controllers/eval_controller.rb
 test/integration/app/app/controllers/items_controller.rb
@@ -19,9 +20,11 @@ test/integration/app/app/helpers/application_helper.rb
 test/integration/app/app/helpers/eval_helper.rb
 test/integration/app/app/helpers/items_helper.rb
 test/integration/app/app/models/item.rb
+test/integration/app/app/views/items/detail.html.erb
 test/integration/app/app/views/items/list.html.erb
 test/integration/app/app/views/items/recent.html.erb
 test/integration/app/app/views/items/show.html.erb
+test/integration/app/app/views/layouts/application.html.erb
 test/integration/app/app/views/shared/_related.html.erb
 test/integration/app/config/boot.rb
 test/integration/app/config/database.yml
@@ -33,18 +36,7 @@ test/integration/app/config/initializers/inflections.rb
 test/integration/app/config/initializers/mime_types.rb
 test/integration/app/config/memcached.yml
 test/integration/app/config/routes.rb
-test/integration/app/coverage/cache-43041
-test/integration/app/coverage/index.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-action_controller_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-action_view_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-active_record_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-config_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-core_extensions_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-interlock_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock-memcached_rb.html
-test/integration/app/coverage/vendor-plugins-interlock-lib-interlock_rb.html
 test/integration/app/db/migrate/001_create_items.rb
-test/integration/app/db/schema.rb
 test/integration/app/doc/README_FOR_APP
 test/integration/app/public/404.html
 test/integration/app/public/422.html
@@ -85,5 +77,6 @@ test/integration/server_test.rb
 test/setup.rb
 test/teardown.rb
 test/test_helper.rb
+test/unit/interlock_test.rb
 test/unit/memcached_test.rb
 TODO
