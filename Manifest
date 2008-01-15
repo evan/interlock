@@ -20,12 +20,12 @@ test/integration/app/app/helpers/application_helper.rb
 test/integration/app/app/helpers/eval_helper.rb
 test/integration/app/app/helpers/items_helper.rb
 test/integration/app/app/models/item.rb
-test/integration/app/app/views/items/detail.html.erb
-test/integration/app/app/views/items/list.html.erb
-test/integration/app/app/views/items/recent.html.erb
-test/integration/app/app/views/items/show.html.erb
+test/integration/app/app/views/items/detail.rhtml
+test/integration/app/app/views/items/list.rhtml
+test/integration/app/app/views/items/recent.rhtml
+test/integration/app/app/views/items/show.rhtml
 test/integration/app/app/views/layouts/application.html.erb
-test/integration/app/app/views/shared/_related.html.erb
+test/integration/app/app/views/shared/_related.rhtml
 test/integration/app/config/boot.rb
 test/integration/app/config/database.yml
 test/integration/app/config/environment.rb
