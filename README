@@ -13,6 +13,9 @@ The public certificate for the gem is at http://rubyforge.org/frs/download.php/2
 
 * memcached (http://www.danga.com/memcached)
 * memcache-client gem
+* Rails 1.2.6
+
+Note that Rails 2.0.2 is required for caching <tt>content_for</tt> or nesting <tt>view_cache</tt> blocks.
 
 == What it does
 

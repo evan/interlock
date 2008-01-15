@@ -1,6 +1,4 @@
 
-RAILS_GEM_VERSION = ENV['MULTIRAILS_RAILS_VERSION'] if ENV['MULTIRAILS_RAILS_VERSION']
-
 require File.join(File.dirname(__FILE__), 'boot')
 require 'action_controller'
 
@@ -23,5 +21,3 @@ Rails::Initializer.run do |config|
 end
 
 ENV['RAILS_ASSET_ID'] = rand.to_s
-
-require 'google_chart'

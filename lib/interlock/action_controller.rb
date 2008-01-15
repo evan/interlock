@@ -149,7 +149,7 @@ And in the <tt>show.html.erb</tt> view:
     # Callback to reset the local cache.
     #
     def clear_interlock_local_cache
-      Interlock.local_cache = ActionController::Base::MemoryStore.new
+      Interlock.local_cache = ::ActionController::Base::MemoryStore.new
       RAILS_DEFAULT_LOGGER.warn "** cleared interlock local cache"
     end    
     
