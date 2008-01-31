@@ -5,11 +5,9 @@ A Rails plugin for maintainable and high-efficiency caching.
 
 == License
 
-Copyright 2007, 2008 Cloudburst, LLC. Licensed under the AFL 3. See the included LICENSE file. Portions copyright 2006 Chris Wanstrath and used with permission.
+Copyright 2007 Cloudburst, LLC. Licensed under the AFL 3; see the included LICENSE file. Portions copyright 2006 Chris Wanstrath and used with permission.
 
-The public certificate for the gem is here[http://rubyforge.org/frs/download.php/25331/evan_weaver-original-public_cert.pem]. 
-
-If you like this software, please {make a donation}[http://blog.evanweaver.com/donate/], or {recommend Evan}[http://www.workingwithrails.com/person/7739-evan-weaver] at Working with Rails.
+The public certificate for the gem is at http://rubyforge.org/frs/download.php/25331/evan_weaver-original-public_cert.pem.
 
 == Requirements
 
@@ -108,6 +106,6 @@ Also, Interlock obeys the <tt>ENV['RAILS_ASSET_ID']</tt> setting, so if you need
 
 == Reporting problems
 
-The support forum is here[http://rubyforge.org/forum/forum.php?forum_id=19835].
+* http://rubyforge.org/forum/forum.php?forum_id=19835
 
 Patches and contributions are very welcome. Please note that contributors are required to assign copyright for their additions to Cloudburst, LLC. 
