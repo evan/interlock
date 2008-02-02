@@ -7,7 +7,7 @@ lib/interlock/active_record.rb
 lib/interlock/config.rb
 lib/interlock/core_extensions.rb
 lib/interlock/interlock.rb
-lib/interlock/memcached.rb
+lib/interlock/lock.rb
 lib/interlock.rb
 LICENSE
 Manifest
@@ -78,5 +78,5 @@ test/setup.rb
 test/teardown.rb
 test/test_helper.rb
 test/unit/interlock_test.rb
-test/unit/memcached_test.rb
+test/unit/lock_test.rb
 TODO

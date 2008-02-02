@@ -29,7 +29,7 @@ Interlock automatically tracks invalidation dependencies based on the model life
   
 First, compile and install memcached itself. Get a memcached server running.
 
-You also need the <tt>memcache-client</tt> gem:
+You also need either <tt>memcache-client</tt> (or {memcached}[http://blog.evanweaver.com/files/doc/fauna/memcached]):
   sudo gem install memcache-client
 
 Then, install the plugin:
@@ -40,15 +40,18 @@ Lastly, configure your Rails app for memcached by creating a <tt>config/memcache
   defaults:
     namespace: myapp
     sessions: false
+    client: memcache-client
   development:
     servers: 
-      - localhost:11211 # Default port
+      - 127.0.0.1:11211 # Default host and port
   production:
     servers
       - 10.12.128.1
       - 10.12.128.2     
       
 Now you're ready to go.
+
+Note that if you have {memcached 0.7}[http://blog.evanweaver.com/files/doc/fauna/memcached], you can use <tt>client: memcached</tt> for better performance.
  
 == Usage
 

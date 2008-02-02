@@ -5,7 +5,11 @@ module Interlock
   end  
   class DependencyError < InterlockError #:nodoc:
   end  
+  class ConfigurationError < InterlockError #:nodoc:
+  end
   class UsageError < InterlockError #:nodoc:
+  end
+  class LockAcquisitionError < InterlockError #:nodoc:
   end
   class FragmentConsistencyError < InterlockError #:nodoc:
   end

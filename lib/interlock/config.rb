@@ -4,8 +4,19 @@ module Interlock
   DEFAULTS = {
     :ttl => 1.day,
     :namespace => 'app',
-    :servers => ['localhost:11211']
+    :servers => ['127.0.0.1:11211'],
+    :client => 'memcache-client'
   }    
+  
+  CLIENT_KEYS = [ #:nodoc:
+    :hash,
+    :no_block,
+    :buffer_requests,
+    :support_cas,
+    :tcp_nodelay,
+    :distribution,
+    :namespace
+  ]
 
   mattr_accessor :config 
   @@config = DEFAULTS
@@ -23,7 +34,8 @@ module Interlock
       #
       def run!
         if File.exist?(CONFIG_FILE)
-          config = YAML.load_file(CONFIG_FILE)
+          template = ERB.new(File.open(CONFIG_FILE) {|f| f.read})       
+          config = YAML.load(template.result(binding))
           config.deep_symbolize_keys!
 
           Interlock.config.merge!(config[:defaults] || {})
@@ -41,12 +53,31 @@ module Interlock
         Interlock.config[:namespace] << "-#{RAILS_ENV}"
   
         unless defined? Object::CACHE
-          klass = MemCacheWithConsistentHashing rescue MemCache
-          Object.const_set('CACHE', klass.new(Interlock.config))
-          CACHE.servers = Array(Interlock.config[:servers])
+        
+          # Give people a choice of client, even though I don't like conditional dependencies.
+          klass = case Interlock.config[:client]
+            when 'memcached'
+              require 'memcached'
+              Memcached::Rails
+            when 'memcache-client'              
+              raise ConfigurationError, "You have the Ruby-MemCache gem installed. Please uninstall Ruby-MemCache, or otherwise guarantee that memcache-client will load instead." if MemCache.constants.include?('SVNURL')
+              MemCache              
+            else
+              raise ConfigurationError, "Invalid client name '#{Interlock.config[:client]}'"
+          end
+          
+          Object.const_set('CACHE', 
+            klass.new(
+              Interlock.config[:servers], 
+              Interlock.config.slice(*CLIENT_KEYS)
+            )
+          )
         end
         
+        # Add the fragment cache and lock APIs to the cache singleton.
         class << CACHE
+          include Interlock::Lock
+          
           def read(*args)
             get args.first
           end

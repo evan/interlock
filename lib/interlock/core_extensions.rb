@@ -40,16 +40,26 @@ class Hash
     end
   end
   
+  # Compatibility method for Rails 1.2.6. It's also faster.
+  unless Hash.instance_methods.include? "slice"
+    def slice(*keys)
+      hash = {}
+      keys.each do |key|
+        hash[key] = self[key] if self[key]
+      end
+      hash
+    end  
+  end
+  
 end
 
 class Array  
-  unless Array.instance_methods.include? "extract_options!"
-  
+  # Compatibility method for Rails 1.2.6.
+  unless Array.instance_methods.include? "extract_options!"  
     def extract_options!
       # Method added in Rails rev 7217
       last.is_a?(Hash) ? pop : {}
-    end
-    
+    end    
   end  
 end
 
