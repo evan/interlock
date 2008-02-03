@@ -72,9 +72,26 @@ module Interlock
               Interlock.config.slice(*CLIENT_KEYS)
             )
           )
+          
+          # Mark that we're the ones who did it.
+          class << CACHE
+            def installed_by_interlock; true; end
+          end
+          
+        else
+          begin
+            CACHE.installed_by_interlock
+          rescue NoMethodError
+            RAILS_DEFAULT_LOGGER.warn "** interlock: Object::CACHE already defined; will not install a new one"
+            # Mark that somebody else installed this CACHE.
+            class << CACHE
+              def installed_by_interlock; false; end
+            end
+          end
         end
         
-        # Add the fragment cache and lock APIs to the cache singleton.
+        # Add the fragment cache and lock APIs to the cache singleton. This happens no matter
+        # who installed the singleton.
         class << CACHE
           include Interlock::Lock
           
