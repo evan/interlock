@@ -57,7 +57,6 @@ module Interlock
           # Give people a choice of client, even though I don't like conditional dependencies.
           klass = case Interlock.config[:client]
             when 'memcached'
-              require 'memcached'
               Memcached::Rails
             when 'memcache-client'              
               raise ConfigurationError, "You have the Ruby-MemCache gem installed. Please uninstall Ruby-MemCache, or otherwise guarantee that memcache-client will load instead." if MemCache.constants.include?('SVNURL')
