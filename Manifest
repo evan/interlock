@@ -8,7 +8,6 @@ lib/interlock/config.rb
 lib/interlock/core_extensions.rb
 lib/interlock/interlock.rb
 lib/interlock/lock.rb
-lib/interlock/memcached.rb
 lib/interlock.rb
 LICENSE
 Manifest
@@ -26,7 +25,6 @@ test/integration/app/app/views/items/list.rhtml
 test/integration/app/app/views/items/recent.rhtml
 test/integration/app/app/views/items/show.rhtml
 test/integration/app/app/views/layouts/application.html.erb
-test/integration/app/app/views/shared/_related.html.erb
 test/integration/app/app/views/shared/_related.rhtml
 test/integration/app/config/boot.rb
 test/integration/app/config/database.yml
