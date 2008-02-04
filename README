@@ -29,7 +29,7 @@ Interlock automatically tracks invalidation dependencies based on the model life
   
 First, compile and install memcached itself. Get a memcached server running.
 
-You also need either <tt>memcache-client</tt> (or {memcached}[http://blog.evanweaver.com/files/doc/fauna/memcached]):
+You also need either <tt>memcache-client</tt> or {memcached}[http://blog.evanweaver.com/files/doc/fauna/memcached]:
   sudo gem install memcache-client
 
 Then, install the plugin:

@@ -112,9 +112,17 @@ module Interlock
       # Configure Rails to use the memcached store for fragments, and optionally, sessions.
       #    
       def rails!
-        # Memcached fragment caching is mandatory
+        # Memcached fragment caching is mandatory        
+        ActionView::Helpers::CacheHelper.class_eval do
+          def cache(name, options = nil, &block)
+            # Things explode if options does not default to nil
+            RAILS_DEFAULT_LOGGER.debug "** fragment #{name} stored via obsolete cache() call"
+            @controller.cache_erb_fragment(block, name, options)
+          end
+        end                
         ActionController::Base.fragment_cache_store = CACHE
   
+        # Sessions are optional
         if Interlock.config[:sessions]
           ActionController::Base.session_store = :mem_cache_store
           ActionController::CgiRequest::DEFAULT_SESSION_OPTIONS.update 'cache' => CACHE      
