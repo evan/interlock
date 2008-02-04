@@ -189,33 +189,41 @@ And in the <tt>show.html.erb</tt> view:
       #
       def read_fragment(key, options = nil)
         return unless perform_caching
-
-        if content = Interlock.local_cache.read(key, options)
-          # Interlock.say key, "read from local cache"
-        elsif content = fragment_cache_store.read(key, options)                    
-          raise FragmentConsistencyError, "#{key} is not an Array" unless content.is_a? Array
-          Interlock.say key, "read from memcached"
-          Interlock.local_cache.write(key, content, options)
-        else
-          # Not found
-          return nil 
-        end
         
-        raise FragmentConsistencyError, "#{key}::content is not a String" unless content.first.is_a? String
-
-        options ||= {}
-        # Note that 'nil' is considered true for :assign_content_for
-        if options[:assign_content_for] != false and content.last 
-          # Extract content_for variables
-          content.last.each do |name, value| 
-            raise FragmentConsistencyError, "#{key}::content_for(:#{name}) is not a String" unless value.is_a? String
-            # We'll just call the helper because that will handle nested view_caches properly.
-            @template.send(:content_for, name, value)
+        begin
+          if content = Interlock.local_cache.read(key, options)
+            # Interlock.say key, "read from local cache"
+          elsif content = fragment_cache_store.read(key, options)                    
+            raise Interlock::FragmentConsistencyError, "#{key} expected Array but got #{content.class}" unless content.is_a? Array
+            Interlock.say key, "read from memcached"
+            Interlock.local_cache.write(key, content, options)
+          else
+            # Not found
+            return nil 
           end
-        end
-
-        content.first        
-      end      
+          
+          raise Interlock::FragmentConsistencyError, "#{key}::content expected String but got #{content.first.class}" unless content.first.is_a? String
+  
+          options ||= {}
+          # Note that 'nil' is considered true for :assign_content_for
+          if options[:assign_content_for] != false and content.last 
+            # Extract content_for variables
+            content.last.each do |name, value| 
+              raise Interlock::FragmentConsistencyError, "#{key}::content_for(:#{name}) expected String but got #{value.class}" unless value.is_a? String
+              # We'll just call the helper because that will handle nested view_caches properly.
+              @template.send(:content_for, name, value)
+            end
+          end
+  
+          content.first
+        rescue Interlock::FragmentConsistencyError => e
+          # XXX Needs test coverage
+          # Delete the bogus key
+          begin; CACHE.delete key; rescue; end
+          # Reraise the error
+          raise e
+        end      
+      end
       
     end
   end    
