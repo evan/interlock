@@ -150,7 +150,7 @@ And in the <tt>show.html.erb</tt> view:
     #
     def clear_interlock_local_cache
       Interlock.local_cache = ::ActionController::Base::MemoryStore.new
-      CACHE.reset if CACHE.respond_to? :reset
+      CACHE.reset if Interlock.config[:client] ==  'memcached'
       RAILS_DEFAULT_LOGGER.warn "** cleared interlock local cache"
     end    
     
