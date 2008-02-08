@@ -8,6 +8,7 @@ require 'interlock/interlock'
 require 'interlock/lock'
 require 'interlock/action_controller'
 require 'interlock/action_view'
+require 'interlock/finders'
 require 'interlock/active_record'
 
 begin

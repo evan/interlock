@@ -16,13 +16,15 @@ desc "Run all the tests in production and development mode both"
 task "test_all" do  
   ['memcache-client', 'memcached'].each do |client|
     ENV['CLIENT'] = client
-    ENV['PRODUCTION'] = 'false'
-    STDERR.puts "#{'='*80}\nDevelopment mode: #{client}\n#{'='*80}"
-    system("rake test:multi_rails:all")
-  
-    ENV['PRODUCTION'] = 'true'
-    STDERR.puts "#{'='*80}\nProduction mode: #{client}\n#{'='*80}"
-    system("rake test:multi_rails:all")
+    ['false', 'true'].each do |finder|
+      ENV['FINDERS'] = finder    
+      ['false', 'true'].each do |env|
+        ENV['PRODUCTION'] = env
+        mode = env == 'false' ? "Development" : "Production"
+        STDERR.puts "#{'='*80}\n#{mode} mode, #{client}, finders #{finder}\n#{'='*80}"
+        system("rake test:multi_rails:all")
+      end
+    end
   end
 end
 

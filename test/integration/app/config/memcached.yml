@@ -3,6 +3,7 @@ defaults:
   namespace: interlock
   sessions: true
   client: <%= ENV['CLIENT'] || 'memcached' %>
+  with_finders: <%= ENV['FINDERS'] || true %>
 development:
   servers: 
     - 127.0.0.1:43042

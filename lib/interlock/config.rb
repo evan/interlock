@@ -5,7 +5,8 @@ module Interlock
     :ttl => 1.day,
     :namespace => 'app',
     :servers => ['127.0.0.1:11211'],
-    :client => 'memcache-client'
+    :client => 'memcache-client',
+    :with_finders => false
   }    
   
   CLIENT_KEYS = [ #:nodoc:
@@ -42,14 +43,15 @@ module Interlock
           Interlock.config.merge!(config[RAILS_ENV.to_sym] || {})
         end
         
-        memcached!
-        rails!
+        install_memcached
+        install_fragments        
+        install_finders if Interlock.config[:with_finders]
       end
   
       # 
       # Configure memcached for this app.
       #
-      def memcached!
+      def install_memcached
         Interlock.config[:namespace] << "-#{RAILS_ENV}"
   
         unless defined? Object::CACHE
@@ -110,7 +112,7 @@ module Interlock
       #
       # Configure Rails to use the memcached store for fragments, and optionally, sessions.
       #    
-      def rails!
+      def install_fragments
         # Memcached fragment caching is mandatory        
         ActionView::Helpers::CacheHelper.class_eval do
           def cache(name, options = nil, &block)
@@ -127,6 +129,21 @@ module Interlock
           ActionController::CgiRequest::DEFAULT_SESSION_OPTIONS.update 'cache' => CACHE      
         end      
       end    
+      
+      #
+      # Configure ActiveRecord#find caching.
+      #
+      def install_finders
+        # RAILS_DEFAULT_LOGGER.warn "** using interlock finder caches"      
+        class << ActiveRecord::Base
+          private      
+          alias :find_via_db :find
+          remove_method :find
+          
+          public
+          include Interlock::Finders
+        end        
+      end
 
     end      
   end

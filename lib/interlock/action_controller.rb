@@ -218,9 +218,8 @@ And in the <tt>show.html.erb</tt> view:
   
           content.first
         rescue Interlock::FragmentConsistencyError => e
-          # XXX Needs test coverage
           # Delete the bogus key
-          begin; CACHE.delete key; rescue; end
+          Interlock.invalidate(key)
           # Reraise the error
           raise e
         end      

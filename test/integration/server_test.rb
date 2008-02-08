@@ -115,41 +115,45 @@ class ServerTest < Test::Unit::TestCase
     assert_match(/any:any:all:related invalidated/, log)
     assert_match(/any:any:all:related is running the controller block/, log)
   end
-  
-  def test_caching_of_content_for
-    assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
-    assert_match(/all:untagged is running the controller block/, log)
-    assert_match(/all:untagged wrote/, log)
     
-    truncate
-    assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
-    # Make sure we didn't copy the content_for too many times
-    assert_no_match(/Interlock Test:\s*\d\s*Items\s*\d\s*Items/m, browse("items"))
-    assert_no_match(/all:untagged is running the controller block/, log)
-    assert_match(/all:untagged read from memcached/, log)
-  end  
+  unless ENV['RAILS_GEM_VERSION'] == "1.2.6"
+    # This functionality not supported on 1.2.6
   
-  def test_nested_view_caches
-    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
-    assert_match(/detail:1:outer is running the controller block/, log)
-    assert_match(/detail:1:inner is running the controller block/, log)
+    def test_caching_of_content_for
+      assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
+      assert_match(/all:untagged is running the controller block/, log)
+      assert_match(/all:untagged wrote/, log)
+      
+      truncate
+      assert_match(/Interlock Test:\s*\d\s*Items/m, browse("items"))
+      # Make sure we didn't copy the content_for too many times
+      assert_no_match(/Interlock Test:\s*\d\s*Items\s*\d\s*Items/m, browse("items"))
+      assert_no_match(/all:untagged is running the controller block/, log)
+      assert_match(/all:untagged read from memcached/, log)
+    end  
     
-    truncate
-    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
-    assert_no_match(/detail:1:outer is running the controller block/, log)
-    assert_no_match(/detail:1:inner is running the controller block/, log)
-
-    truncate
-    remote_eval("Item.find(2).save!")
-    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
-    assert_match(/detail:1:outer is running the controller block/, log)
-    assert_no_match(/detail:1:inner is running the controller block/, log)
-
-    truncate
-    remote_eval("Item.find(1).save!")
-    assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
-    assert_match(/detail:1:outer is running the controller block/, log)
-    assert_match(/detail:1:inner is running the controller block/, log)    
+    def test_nested_view_caches
+      assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+      assert_match(/detail:1:outer is running the controller block/, log)
+      assert_match(/detail:1:inner is running the controller block/, log)
+      
+      truncate
+      assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+      assert_no_match(/detail:1:outer is running the controller block/, log)
+      assert_no_match(/detail:1:inner is running the controller block/, log)
+  
+      truncate
+      remote_eval("Item.find(2).save!")
+      assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+      assert_match(/detail:1:outer is running the controller block/, log)
+      assert_no_match(/detail:1:inner is running the controller block/, log)
+  
+      truncate
+      remote_eval("Item.find(1).save!")
+      assert_match(/Outer: Inner<.*2 total items.*Artichoke/m, browse("items/detail/1"))
+      assert_match(/detail:1:outer is running the controller block/, log)
+      assert_match(/detail:1:inner is running the controller block/, log)    
+    end    
   end
   
   ### Support methods

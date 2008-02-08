@@ -89,8 +89,8 @@ module Interlock
       end
     end
 
-    def say(key, msg) #:nodoc:
-      RAILS_DEFAULT_LOGGER.warn "** fragment #{key.inspect[1..-2]} #{msg}"
+    def say(key, msg, type = "fragment") #:nodoc:
+      RAILS_DEFAULT_LOGGER.warn "** #{type} #{key.inspect[1..-2]} #{msg}"
     end
      
     #   
@@ -128,6 +128,7 @@ module Interlock
     # Invalidate a particular key.
     #
     def invalidate(key)
+      Interlock.local_cache.delete(key)
       ActionController::Base.fragment_cache_store.delete key
     end    
     
