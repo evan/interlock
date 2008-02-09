@@ -76,7 +76,7 @@ module Interlock
     end
     
     def load_from_local_cache(current, keys_to_ids)
-      # Console does not install the local cache
+      # Console and tests do not install the local cache
       return unless Interlock.local_cache
             
       # Load from the local cache      

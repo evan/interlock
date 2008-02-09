@@ -128,7 +128,9 @@ module Interlock
     # Invalidate a particular key.
     #
     def invalidate(key)
-      Interlock.local_cache.delete(key)
+      # Console and tests do not install the local cache
+      Interlock.local_cache.delete(key) if Interlock.local_cache
+
       ActionController::Base.fragment_cache_store.delete key
     end    
     
