@@ -97,11 +97,11 @@ module Interlock
           include Interlock::Lock
           
           def read(*args)
-            get args.first
+            get args.first.to_s
           end
           
           def write(name, content, options = {})             
-            set(name, 
+            set(name.to_s, 
               content, 
               options.is_a?(Hash) ? options[:ttl] : Interlock.config[:ttl] )
           end          
