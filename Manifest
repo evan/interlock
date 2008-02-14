@@ -6,8 +6,10 @@ lib/interlock/action_view.rb
 lib/interlock/active_record.rb
 lib/interlock/config.rb
 lib/interlock/core_extensions.rb
+lib/interlock/finders.rb
 lib/interlock/interlock.rb
 lib/interlock/lock.rb
+lib/interlock/pass_through_store.rb
 lib/interlock.rb
 LICENSE
 Manifest
@@ -77,6 +79,7 @@ test/integration/server_test.rb
 test/setup.rb
 test/teardown.rb
 test/test_helper.rb
+test/unit/finder_test.rb
 test/unit/interlock_test.rb
 test/unit/lock_test.rb
 TODO

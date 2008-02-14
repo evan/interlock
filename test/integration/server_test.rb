@@ -18,7 +18,7 @@ class ServerTest < Test::Unit::TestCase
   end
   
   
-  ### Tests
+  ### Fragment caching tests
   
   def test_render
     assert_match(/Welcome/, browse)

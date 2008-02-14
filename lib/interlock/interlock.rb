@@ -26,6 +26,11 @@ module Interlock
   ILLEGAL_KEY_CHARACTERS_PATTERN = /\s/
   
   mattr_accessor :local_cache
+  
+  # Install the pass-through store. This is used in the console and test 
+  # environment. In a server environment, the controller callbacks install
+  # the memory store before each request.  
+  @@local_cache = Interlock::PassThroughStore.new
     
   class << self
     #

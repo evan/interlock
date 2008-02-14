@@ -9,7 +9,7 @@ module Interlock
     :with_finders => false
   }    
   
-  CLIENT_KEYS = [ #:nodoc:
+  CLIENT_KEYS = [ 
     :hash,
     :no_block,
     :buffer_requests,
@@ -17,7 +17,7 @@ module Interlock
     :tcp_nodelay,
     :distribution,
     :namespace
-  ]
+  ] 
 
   mattr_accessor :config 
   @@config = DEFAULTS

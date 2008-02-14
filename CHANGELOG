@@ -1,5 +1,5 @@
 
-v1.3. Add basic model caching.
+v1.3. Add basic finder memoization.
 
 v1.2. Add compatibility with Memcached client.
 

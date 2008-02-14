@@ -9,7 +9,7 @@ module Interlock
     #    
     def find(*args)
       return find_via_db(*args) if args.last.is_a? Hash or args.first.is_a? Symbol
-      records = find_via_cache(args, true)
+      records = find_via_cache(args.flatten, true)
 
       if args.length > 1 or args.first.is_a? Array
         records
@@ -32,7 +32,7 @@ module Interlock
     #    
     def find_all_by_id(*args)
       return method_missing(:find_all_by_id, *args) if args.last.is_a? Hash 
-      find_via_cache(ids, false)
+      find_via_cache(args, false)
     end
     
     #
@@ -49,7 +49,7 @@ module Interlock
         
     private
     
-    def find_via_cache(ids, should_raise)
+    def find_via_cache(ids, should_raise) #:doc:
       results = []
 
       ordered_keys_to_ids = ids.map { |id| [caching_key(id), id.to_i] }
@@ -75,10 +75,7 @@ module Interlock
       results      
     end
     
-    def load_from_local_cache(current, keys_to_ids)
-      # Console and tests do not install the local cache
-      return unless Interlock.local_cache
-            
+    def load_from_local_cache(current, keys_to_ids) #:doc:            
       # Load from the local cache      
       records = {}
       keys_to_ids.each do |key, |
@@ -88,7 +85,7 @@ module Interlock
       current.merge!(records)        
     end
 
-    def load_from_memcached(current, keys_to_ids)
+    def load_from_memcached(current, keys_to_ids) #:doc:
       # Drop to memcached if necessary
       if current.size < keys_to_ids.size
         records = {}
@@ -106,7 +103,7 @@ module Interlock
       end    
     end
 
-    def load_from_db(current, keys_to_ids)
+    def load_from_db(current, keys_to_ids) #:doc:
       # Drop to db if necessary
       if current.size < keys_to_ids.size
         missed = keys_to_ids.reject { |key, | current[key] }

@@ -19,11 +19,15 @@ If you use this software, please {make a donation}[http://blog.evanweaver.com/do
 
 Note that Rails 2.0.2 is required for caching <tt>content_for</tt> or nesting <tt>view_cache</tt> blocks.
 
-== What it does
+== Features
 
-Interlock makes your view fragments and associated controller blocks march along together. If a fragment is fresh, the controller behavior won't run. This eliminates duplicate effort from your request cycle. Your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
+Interlock is an intelligent fragment cache for Rails. 
 
-Interlock automatically tracks invalidation dependencies based on the model lifecyle, and supports arbitrary levels of scoping per-block. It also caches <tt>content_for</tt> calls, unlike regular Rails.
+It works by making your view fragments and associated controller blocks march along together. If a fragment is fresh, the controller behavior won't run. This eliminates duplicate effort from your request cycle. Your controller blocks run so infrequently that you can use regular ActiveRecord finders and not worry about object caching at all.
+
+Invalidations are automatically tracked based on the model lifecyle, and you can scope any block to an arbitrary level. Interlock also caches <tt>content_for</tt> calls, unlike regular Rails, and can optionally cache simple finders.
+
+Interlock uses a tiered caching layer so that multiple lookups of a key only hit memcached once per request.
 
 == Installation
   
@@ -86,6 +90,18 @@ This automatically registers a caching dependency on Item for <tt>slow_action</t
 You can use multiple instance variables in one block, of course. Just make sure the <tt>behavior_cache</tt> provides whatever the <tt>view_cache</tt> uses.
 
 See ActionController::Base and ActionView::Helpers::CacheHelper for more details.
+
+== Caching finders
+
+Interlock 1.3 adds the ability to cache simple finder lookups. Add this line in <tt>config/memcached.yml</tt>:
+
+  with_finders: true
+  
+Now, whenever you call <b>find</b>, <b>find_by_id</b>, or <b>find_all_by_id</b> with a single id or an array of ids, the cache will be used. The cache key for each record invalidates when the record is saved or destroyed. Memcached's multiget mode is used for maximum performance.
+
+If you pass any parameters other than ids, or use dynamic finders, the cache will not be used. This means that <tt>:include</tt> works as expected and does not require complicated invalidation. 
+
+See Interlock::Finders for more.
 
 == Notes
 
