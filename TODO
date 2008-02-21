@@ -1,7 +1,7 @@
 
 Soon:
 
-* Explicitly test finder caching
+* Throw a nice error message when the requested memcache client cannot be found
 * Add anti-dogpiling logic
 
 Someday:
