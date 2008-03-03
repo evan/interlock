@@ -55,7 +55,7 @@ Lastly, configure your Rails app for memcached by creating a <tt>config/memcache
       
 Now you're ready to go.
 
-Note that if you have {memcached 0.7}[http://blog.evanweaver.com/files/doc/fauna/memcached], you can use <tt>client: memcached</tt> for better performance.
+Note that if you have the {memcached}[http://blog.evanweaver.com/files/doc/fauna/memcached] client, you can use <tt>client: memcached</tt> for better performance.
  
 == Usage
 
