@@ -30,7 +30,7 @@ Note that the cached item is not guaranteed to live this long. An invalidation r
 
 It's fine to use a <tt>view_cache</tt> block without a <tt>behavior_cache</tt> block. For example, to mimic regular fragment cache behavior, but take advantage of memcached's <tt>:ttl</tt> support, call:
 
-  <% view_cache :ignore => :all, :tag => 'sidebar', :ttl => 5.minutes %>
+  <% view_cache :ignore => :all, :tag => 'sidebar', :ttl => 5.minutes do %>
   <% end %>  
   
 == Dependencies, scoping, and other options
