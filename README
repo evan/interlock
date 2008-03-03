@@ -49,7 +49,7 @@ Lastly, configure your Rails app for memcached by creating a <tt>config/memcache
     servers: 
       - 127.0.0.1:11211 # Default host and port
   production:
-    servers
+    servers:
       - 10.12.128.1
       - 10.12.128.2     
       
