@@ -59,10 +59,22 @@ module Interlock
           # Give people a choice of client, even though I don't like conditional dependencies.
           klass = case Interlock.config[:client]
             when 'memcached'
-              Memcached::Rails
+              begin
+                Memcached::Rails
+              rescue ArgumentError
+                raise ConfigurationError, "'memcached' client requested but not installed. Try 'sudo port install memcached'."
+              end
+              
             when 'memcache-client'              
-              raise ConfigurationError, "You have the Ruby-MemCache gem installed. Please uninstall Ruby-MemCache, or otherwise guarantee that memcache-client will load instead." if MemCache.constants.include?('SVNURL')
-              MemCache              
+              begin
+                if MemCache.constants.include?('SVNURL')
+                  raise ConfigurationError, "You have the Ruby-MemCache gem installed. Please uninstall Ruby-MemCache, or otherwise guarantee that memcache-client will load instead." 
+                end
+                MemCache              
+              rescue ArgumentError
+                raise ConfigurationError, "'memcache-client' client requested but not installed. Try 'sudo port install memcache-client'."
+              end
+              
             else
               raise ConfigurationError, "Invalid client name '#{Interlock.config[:client]}'"
           end
@@ -125,6 +137,8 @@ module Interlock
   
         # Sessions are optional
         if Interlock.config[:sessions]
+          # XXX Right now this requires memcache-client to be installed, due to a Rails problem.
+          # http://dev.rubyonrails.org/ticket/11290
           ActionController::Base.session_store = :mem_cache_store
           ActionController::CgiRequest::DEFAULT_SESSION_OPTIONS.update 'cache' => CACHE      
         end      
