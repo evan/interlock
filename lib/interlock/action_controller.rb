@@ -16,7 +16,7 @@ If you pass an Array of symbols as the tag, it will get value-mapped onto params
       ignore = Interlock::SCOPE_KEYS if ignore.include? :all    
       
       if (Interlock::SCOPE_KEYS - ignore).empty? and !tag
-        raise UsageError, "You must specify a :tag if you are ignoring the entire default scope."
+        raise Interlock::UsageError, "You must specify a :tag if you are ignoring the entire default scope."
       end
         
       if tag.is_a? Array and tag.all? {|x| x.is_a? Symbol}
@@ -121,7 +121,7 @@ And in the <tt>show.html.erb</tt> view:
       conventional_class = begin; controller_name.classify.constantize; rescue NameError; end
       options, dependencies = Interlock.extract_options_and_dependencies(args, conventional_class)
       
-      raise UsageError, ":ttl has no effect in a behavior_cache block" if options[:ttl]
+      raise Interlock::UsageError, ":ttl has no effect in a behavior_cache block" if options[:ttl]
 
       key = caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
 
