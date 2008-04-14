@@ -62,7 +62,7 @@ module Interlock
               begin
                 Memcached::Rails
               rescue ArgumentError
-                raise ConfigurationError, "'memcached' client requested but not installed. Try 'sudo port install memcached'."
+                raise ConfigurationError, "'memcached' client requested but not installed. Try 'sudo gem install memcached'."
               end
               
             when 'memcache-client'              
@@ -72,7 +72,7 @@ module Interlock
                 end
                 MemCache              
               rescue ArgumentError
-                raise ConfigurationError, "'memcache-client' client requested but not installed. Try 'sudo port install memcache-client'."
+                raise ConfigurationError, "'memcache-client' client requested but not installed. Try 'sudo gem install memcache-client'."
               end
               
             else
