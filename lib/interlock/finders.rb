@@ -10,7 +10,7 @@ module Interlock
     def find(*args)
       args.pop if args.last.nil? or (args.last.is_a? Hash and !args.last.values.any?)
       return find_via_db(*args) if args.last.is_a? Hash or args.first.is_a? Symbol
-            
+      
       records = find_via_cache(args.flatten, true)
 
       if args.length > 1 or args.first.is_a? Array
@@ -54,7 +54,7 @@ module Interlock
     def find_via_cache(ids, should_raise) #:doc:
       results = []
 
-      ordered_keys_to_ids = ids.map { |id| [caching_key(id), id.to_i] }
+      ordered_keys_to_ids = ids.flatten.map { |id| [caching_key(id), id.to_i] }
       keys_to_ids = Hash[*ordered_keys_to_ids.flatten]
 
       records = {}
