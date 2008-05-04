@@ -9,7 +9,8 @@ class FinderTest < Test::Unit::TestCase
   ### Finder caching tests
   
   def test_find_without_cache
-    Item.find(1, {})
+    # Non-empty options hash bypasses the cache entirely, including the logging
+    Item.find(1, {:conditions => "1 = 1"})
     assert_no_match(/model.*Item:find:1:default is loading from the db/, log)
   end
   
@@ -68,6 +69,10 @@ class FinderTest < Test::Unit::TestCase
       Item.find_all_by_id([1,2])
     assert_equal Item.find_all_by_id(1, 2, {}), 
       Item.find_all_by_id(1, 2)
+  end
+  
+  def test_invalidate_sti
+    # XXX Need a regression test
   end
 
   def test_find_by_id
