@@ -42,9 +42,14 @@ module Interlock
           Interlock.config.merge!(config[:defaults] || {})
           Interlock.config.merge!(config[RAILS_ENV.to_sym] || {})
         end
-        
-        install_memcached
-        install_fragments        
+
+        # Don't install memcached and fragments if it's :disabled in the config file.
+        unless Interlock.config[:disabled]
+          install_memcached
+          install_fragments        
+        end
+
+        # Always install the finders.
         install_finders if Interlock.config[:with_finders]
       end
   

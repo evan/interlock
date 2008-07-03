@@ -73,8 +73,9 @@ module Interlock
         raise ActiveRecord::RecordNotFound, "Couldn't find #{self.name} with ID=#{keys_to_ids[key]}" if should_raise and !record
         results << record
       end
-      
-      results      
+     
+      # Don't return Nil objects, only the found records
+      results.compact!
     end
     
     def load_from_local_cache(current, keys_to_ids) #:doc:            
@@ -121,7 +122,7 @@ module Interlock
         records.each do |key, value|
           Interlock.say key, "is loading from the db", "model"
           Interlock.local_cache.write(key, value, nil)
-          CACHE.set key, value
+          CACHE.set key, value unless Interlock.config[:disabled]
         end
         
         current.merge!(records)
