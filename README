@@ -1,7 +1,11 @@
 
-Interlock
+Interlock _ Slacker's hacked clone
 
 A Rails plugin for maintainable and high-efficiency caching.
+
+This modified version allows a :disabled key in the configuration file (like CacheFu) which allows you to disable completely the MemCache dependency when in development mode. In our team most most of the development happens on Mac OSX, and compile all the shit there is a waste of time.
+
+Also i've modified the behavior of the *load_from_db* (lib/interlock/finders.rb) to return only the found items in the DB. The default behavior returns nil objects when finding invalid id's in the DB and I experienced problems with this when using Interlock + Ultrasphinx.
 
 == License
 
