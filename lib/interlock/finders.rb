@@ -75,7 +75,7 @@ module Interlock
       end
      
       # Don't return Nil objects, only the found records
-      results.compact!
+      results.compact
     end
     
     def load_from_local_cache(current, keys_to_ids) #:doc:            
