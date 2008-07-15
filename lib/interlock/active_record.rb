@@ -1,7 +1,8 @@
 
 module ActiveRecord #:nodoc:
   class Base
-    
+
+
     #
     # Convert this record to a tag string.
     #
@@ -12,7 +13,6 @@ module ActiveRecord #:nodoc:
     #
     # The expiry callback.
     #
-    
     def expire_interlock_keys
       # Short-circuiting expiration if :disabled.
       return if Interlock.config[:disabled]
@@ -31,8 +31,18 @@ module ActiveRecord #:nodoc:
       end
     end
     
+
     before_save :expire_interlock_keys
     after_destroy :expire_interlock_keys
+
+    #
+    # Reload. Expires the cache and force reload from db.
+    #
+    def reload
+      self.expire_interlock_keys
+      self.class.base_class.find(self.id, {})
+    end
+
             
   end
 end
