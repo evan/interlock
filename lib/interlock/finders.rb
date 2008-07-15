@@ -42,7 +42,7 @@ module Interlock
     #
     def caching_key(id)
       Interlock.caching_key(
-        self.name,
+        self.base_class.name,
         "find",
         id,
         "default"
