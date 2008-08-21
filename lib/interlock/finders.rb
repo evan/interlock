@@ -10,7 +10,7 @@ module Interlock
     def find(*args)
       args.pop if args.last.nil? or (args.last.is_a? Hash and !args.last.values.any?)
       return find_via_db(*args) if args.last.is_a? Hash or args.first.is_a? Symbol
-      
+
       records = find_via_cache(args.flatten, true)
 
       if args.length > 1 or args.first.is_a? Array
@@ -24,16 +24,24 @@ module Interlock
     #
     # Cached find_by_id. Short-circuiting works the same as find.
     #
+    # Read the note on find_all_by_id
     def find_by_id(*args)
-      return method_missing(:find_by_id, *args) if args.last.is_a? Hash
+      #return method_missing(:find_by_id, *args) if args.last.is_a? Hash
+      return if args.last.is_a? Hash
       find_via_cache(args, false).first
     end
     
     #
     # Cached find_all_by_id. Ultrasphinx uses this. Short-circuiting works the same as find.
-    #    
+    #
+    # NOTE: This is pure shit, dude! I don't know exactly which is the behavior of the AR
+    # method_missing but it seems like if you pass a find_all_by_id([3,2,1], {}), the last
+    # Hash returns the (commented) method_missing and it rewrites the find_all_by_id method.
+    # After that any find_all_by_id call behaves like an AR call shooting directly to the DB.
+    # pompilio
     def find_all_by_id(*args)
-      return method_missing(:find_all_by_id, *args) if args.last.is_a? Hash 
+      #return method_missing(:find_all_by_id, *args) if args.last.is_a? Hash
+      return if args.last.is_a? Hash
       find_via_cache(args, false)
     end
     
@@ -42,7 +50,7 @@ module Interlock
     #
     def caching_key(id)
       Interlock.caching_key(
-        self.name,
+        self.base_class.name,
         "find",
         id,
         "default"
@@ -73,8 +81,9 @@ module Interlock
         raise ActiveRecord::RecordNotFound, "Couldn't find #{self.name} with ID=#{keys_to_ids[key]}" if should_raise and !record
         results << record
       end
-      
-      results      
+     
+      # Don't return Nil objects, only the found records
+      results.compact
     end
     
     def load_from_local_cache(current, keys_to_ids) #:doc:            
@@ -112,7 +121,11 @@ module Interlock
         ids_to_keys = keys_to_ids.invert
 
         # Load from the db
-        records = find_all_by_id(missed.values, {})
+        
+        # see the note on the find_all_by_id method
+        #records = find_all_by_id(missed.values, {})
+        
+        records = find_via_db(:all, :conditions => {:id => missed.values})
         records = Hash[*(records.map do |record|
           [ids_to_keys[record.id], record]
         end.flatten)]
@@ -121,7 +134,7 @@ module Interlock
         records.each do |key, value|
           Interlock.say key, "is loading from the db", "model"
           Interlock.local_cache.write(key, value, nil)
-          CACHE.set key, value
+          CACHE.set key, value unless Interlock.config[:disabled]
         end
         
         current.merge!(records)

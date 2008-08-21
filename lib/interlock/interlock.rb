@@ -78,17 +78,25 @@ module Interlock
     def register_dependencies(dependencies, key)
       Array(dependencies).each do |klass, scope|
         dep_key = dependency_key(klass)
-        
-        # Get the value for this class/key out of the global store.
-        this = (CACHE.get(dep_key) || {})[key]
 
-        # Make sure to not overwrite broader scopes.
-        unless this == :all or this == scope
-          # We need to write, so acquire the lock.            
-          CACHE.lock(dep_key) do |hash|
-            Interlock.say key, "registered a dependency on #{klass} -> #{scope.inspect}."
-            (hash || {}).merge({key => scope})
+        # Not sure if this block has to be skipped in developent mode but if
+        # it uses the CACHE i'm not so wrong. Anyway i have to investigate more
+        # why this dependency locking based on classes works correctly whrn in 
+        # production and not when in dev with the cache disabled.
+        unless Interlock.config[:disabled]
+        
+          # Get the value for this class/key out of the global store.
+          this = (CACHE.get(dep_key) || {})[key]
+
+          # Make sure to not overwrite broader scopes.
+          unless this == :all or this == scope
+            # We need to write, so acquire the lock.            
+            CACHE.lock(dep_key) do |hash|
+              Interlock.say key, "registered a dependency on #{klass} -> #{scope.inspect}."
+              (hash || {}).merge({key => scope})
+            end
           end
+        
         end
         
       end
