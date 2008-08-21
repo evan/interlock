@@ -57,7 +57,7 @@ module Interlock
       # Configure memcached for this app.
       #
       def install_memcached
-        Interlock.config[:namespace] << "-#{RAILS_ENV}"
+        Interlock.config[:namespace] << "-#{RAILS_ENV.first}"
   
         unless defined? Object::CACHE
         
