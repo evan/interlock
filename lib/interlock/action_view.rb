@@ -44,7 +44,7 @@ See ActionController::Base for explanations of the rest of the options. The <tt>
 
        key = controller.caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
        
-       if options[:perform] == false
+       if options[:perform] == false || Interlock.config[:disabled]
          # Interlock.say key, "is not cached"
          block.call
        else       
@@ -53,7 +53,7 @@ See ActionController::Base for explanations of the rest of the options. The <tt>
          # Interlock.say key, "is rendering"
 
          @cached_content_for, previous_cached_content_for = {}, @cached_content_for
-         @controller.cache_erb_fragment(
+         ::ActionView::TemplateHandlers::ERB.new(@controller).cache_fragment(
            block, 
            key, 
            :ttl => (options.value_for_indifferent_key(:ttl) or Interlock.config[:ttl])

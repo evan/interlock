@@ -125,7 +125,7 @@ And in the <tt>show.html.erb</tt> view:
 
       key = caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
 
-      if options[:perform] == false
+      if options[:perform] == false || Interlock.config[:disabled]
         Interlock.say key, "is not cached"
         yield
       else
