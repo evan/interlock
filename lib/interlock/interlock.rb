@@ -144,7 +144,7 @@ module Interlock
       # Console and tests do not install the local cache
       Interlock.local_cache.delete(key) if Interlock.local_cache
 
-      ActionController::Base.fragment_cache_store.delete key
+      ActionController::Base.cache_store.delete key
     end    
     
   end    

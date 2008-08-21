@@ -149,7 +149,7 @@ And in the <tt>show.html.erb</tt> view:
     # Callback to reset the local cache.
     #
     def clear_interlock_local_cache
-      Interlock.local_cache = ::ActionController::Base::MemoryStore.new
+      Interlock.local_cache = ::ActiveSupport::Cache::MemoryStore.new
       RAILS_DEFAULT_LOGGER.warn "** cleared interlock local cache"
     end    
     
@@ -172,7 +172,7 @@ And in the <tt>show.html.erb</tt> view:
         
         content = [block_content, @template.cached_content_for]
 
-        fragment_cache_store.write(key, content, options)
+        cache_store.write(key, content, options)
         Interlock.local_cache.write(key, content, options)
 
         Interlock.say key, "wrote"
@@ -193,7 +193,7 @@ And in the <tt>show.html.erb</tt> view:
         begin
           if content = Interlock.local_cache.read(key, options)
             # Interlock.say key, "read from local cache"
-          elsif content = fragment_cache_store.read(key, options)                    
+          elsif content = cache_store.read(key, options)                    
             raise Interlock::FragmentConsistencyError, "#{key} expected Array but got #{content.class}" unless content.is_a? Array
             Interlock.say key, "read from memcached"
             Interlock.local_cache.write(key, content, options)

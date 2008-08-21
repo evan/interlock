@@ -40,7 +40,7 @@ module ActiveRecord #:nodoc:
     #
     def reload
       self.expire_interlock_keys
-      self.class.base_class.find(self.id, {})
+      super
     end
 
             

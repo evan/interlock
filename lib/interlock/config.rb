@@ -138,7 +138,7 @@ module Interlock
             @controller.cache_erb_fragment(block, name, options)
           end
         end                
-        ActionController::Base.fragment_cache_store = CACHE
+        ActionController::Base.cache_store = CACHE
   
         # Sessions are optional
         if Interlock.config[:sessions]
