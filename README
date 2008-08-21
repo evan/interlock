@@ -15,9 +15,7 @@ If you use this software, please {make a donation}[http://blog.evanweaver.com/do
 
 * memcached (http://www.danga.com/memcached)
 * memcache-client gem
-* Rails 1.2.6
-
-Note that Rails 2.0.2 is required for caching <tt>content_for</tt> or nesting <tt>view_cache</tt> blocks.
+* Rails 2.1
 
 == Features
 
