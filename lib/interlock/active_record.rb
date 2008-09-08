@@ -26,7 +26,9 @@ module ActiveRecord #:nodoc:
       
       # Models
       if Interlock.config[:with_finders]
-        Interlock.invalidate(self.class.base_class.caching_key(self.id))
+        key = self.class.base_class.caching_key(self.id)
+        Interlock.say key, 'invalidated with finders', 'model'
+        Interlock.invalidate(key)
       end
     end
     

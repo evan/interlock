@@ -60,7 +60,16 @@ class FinderTest < Test::Unit::TestCase
     assert_match(/model.*Item:find:1:default is loading from the db/, log)
     Item.find(1)
     assert_match(/model.*Item:find:1:default is loading from memcached/, log)  
-  end  
+  end
+  
+  def test_reload_should_invalidate
+    item = Item.find(1)
+    item.reload
+    assert_match(/model.*Item:find:1:default invalidated with finders/, log)
+    truncate
+    Item.find(1)
+    assert_match(/model.*Item:find:1:default is loading from memcached/, log)  
+  end
 
   def test_find_all_by_id
     assert_equal Item.find_all_by_id(44, {}), 
