@@ -2,7 +2,17 @@
 module ActiveRecord #:nodoc:
   class Base
 
-
+    class << self # Class methods
+    
+      def update_counters_with_expiring_keys(id, counters)
+        update_counters_without_expiring_keys(id, counters)
+        find(id).expire_interlock_keys
+      end
+      alias :update_counters_without_expiring_keys :update_counters
+      alias :update_counters :update_counters_with_expiring_keys
+      
+    end
+    
     #
     # Convert this record to a tag string.
     #
@@ -45,6 +55,6 @@ module ActiveRecord #:nodoc:
     end
     alias :reload_without_expiring_keys :reload
     alias :reload :reload_with_expiring_keys
-            
+    
   end
 end
