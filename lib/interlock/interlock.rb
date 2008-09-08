@@ -79,7 +79,7 @@ module Interlock
       return if Interlock.config[:disabled]
  
       Array(dependencies).each do |klass, scope|
-        dep_key = dependency_key(klass)
+        dep_key = dependency_key(klass, scope, key)
       
         # Get the value for this class/key out of the global store.
         this = (CACHE.get(dep_key) || {})[key]
@@ -103,8 +103,9 @@ module Interlock
     # Get the Memcached key for a class's dependency list. We store per-class 
     # to reduce lock contention.
     #
-    def dependency_key(klass) 
-      "interlock:#{ENV['RAILS_ASSET_ID']}:dependency:#{klass.name}"
+    def dependency_key(klass, scope, key) 
+      extra_bit = (scope == :id ? key.field(4) : nil)
+      "interlock:#{ENV['RAILS_ASSET_ID']}:dependency:#{klass.name}:#{extra_bit}"
     end
     
     # 
