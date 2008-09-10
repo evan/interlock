@@ -37,11 +37,11 @@ module ActiveRecord #:nodoc:
     #
     # Reload. Expires the cache and force reload from db.
     #
-    def reload(options)
+    def reload_with_interlock(options)
       self.expire_interlock_keys
-      super(options)
+      reload_without_interlock(options)
     end
-
+    alias_method_chain :reload, :interlock
             
   end
 end
