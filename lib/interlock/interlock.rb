@@ -86,12 +86,12 @@ module Interlock
 
         # Make sure to not overwrite broader scopes.
         unless this == :all or this == scope
-          # We need to write, so acquire the lock.            
+          # We need to write, so acquire the lock.
           CACHE.lock(dep_key) do |hash|
             Interlock.say key, "registered a dependency on #{klass} -> #{scope.inspect}."
             (hash || {}).merge({key => scope})
           end
-        end        
+        end
       end
     end
 
