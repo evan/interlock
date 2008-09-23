@@ -71,7 +71,8 @@ class ServerTest < Test::Unit::TestCase
   
   def test_caching_with_tag
     # This test is a little over-complicated
-    sleep(4)
+    remote_eval("Item.update_all('updated_at = NULL')")
+    
     assert_no_match(/Artichoke/, browse("items/recent?seconds=3"))
     assert_match(/recent:all:3 is running the controller block/, log)
 
@@ -81,7 +82,7 @@ class ServerTest < Test::Unit::TestCase
     assert_no_match(/recent:all:3 is running the controller block/, log)
     
     truncate
-    remote_eval("Item.find(1).save!")
+    remote_eval("Item.find(1).update_attribute('updated_at', Time.now)")
     assert_match(/Artichoke/, browse("items/recent?seconds=4"))
     assert_match(/recent:all:4 is running the controller block/, log)
 
