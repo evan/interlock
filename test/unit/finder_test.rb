@@ -36,6 +36,11 @@ class FinderTest < Test::Unit::TestCase
     assert_match(/model.*Item:find:2:default is loading from memcached/, log)    
   end
   
+  def test_single_element_array_returns_array
+    assert_equal Item.find([1], {}),
+      Item.find([1])
+  end
+  
   def test_find_raise
     assert_raises(ActiveRecord::RecordNotFound) do
       Item.find(44)

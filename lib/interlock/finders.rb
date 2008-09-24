@@ -15,7 +15,7 @@ module Interlock
       
       records = find_via_cache(ids, true)
 
-      if ids.length > 1
+      if ids.length > 1 or args.first.is_a?(Array)
         records
       else
         records.first
