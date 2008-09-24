@@ -39,6 +39,23 @@ class ServerTest < Test::Unit::TestCase
     assert_match(/all:untagged read from memcached/, log)
   end
   
+  def test_controller_respects_log_level
+    remote = <<-CODE
+    RAILS_DEFAULT_LOGGER.level = Logger::INFO;
+    Interlock.config[:log_level] = 'info'
+    CODE
+    remote_eval(remote)
+    
+    truncate
+    browse("items")
+    assert_match(/cleared interlock local cache/, log)
+    
+    remote_eval("Interlock.config[:log_level] = 'debug'")
+    truncate
+    browse("items")
+    assert_no_match(/cleared interlock local cache/, log)
+  end
+  
   def test_broad_invalidation
     browse("items")
     assert_match(/all:untagged is running the controller block/, log)

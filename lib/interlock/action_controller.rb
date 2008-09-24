@@ -150,7 +150,7 @@ And in the <tt>show.html.erb</tt> view:
     #
     def clear_interlock_local_cache
       Interlock.local_cache = ::ActiveSupport::Cache::MemoryStore.new
-      RAILS_DEFAULT_LOGGER.warn "** cleared interlock local cache"
+      Interlock.log "** cleared interlock local cache"
     end    
     
     # Should be registered first in the chain

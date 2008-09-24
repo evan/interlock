@@ -88,7 +88,24 @@ class FinderTest < Test::Unit::TestCase
     assert_equal Item.find_by_id(1, 2, {}), 
       Item.find_by_id(1, 2)
   end
-    
+  
+  def test_custom_log_level
+    old_level = RAILS_DEFAULT_LOGGER.level
+    RAILS_DEFAULT_LOGGER.level = Logger::INFO
+
+    Interlock.config[:log_level] = 'info'
+    truncate
+    Item.find(1)
+    assert_match(/model.*Item:find:1:default is loading/, log)
+
+    Interlock.config[:log_level] = 'debug'
+    truncate
+    Item.find(1)
+    assert_no_match(/model.*Item:find:1:default is loading/, log)
+  ensure
+    RAILS_DEFAULT_LOGGER.level = old_level
+  end
+  
   ### Support methods
   
   def setup

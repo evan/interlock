@@ -96,9 +96,20 @@ module Interlock
     end
 
     def say(key, msg, type = "fragment") #:nodoc:
-      RAILS_DEFAULT_LOGGER.warn "** #{type} #{key.inspect[1..-2]} #{msg}"
+      log "** #{type} #{key.inspect[1..-2]} #{msg}"
     end
-     
+    
+    def log(msg)
+      case Interlock.config[:log_level]
+      when 'debug', 'info', 'warn', 'error'
+        log_method = Interlock.config[:log_level]
+      else
+        log_method = :debug
+      end
+      
+      RAILS_DEFAULT_LOGGER.send( log_method, msg )
+    end
+
     #   
     # Get the Memcached key for a class's dependency list. We store per-class 
     # to reduce lock contention.
