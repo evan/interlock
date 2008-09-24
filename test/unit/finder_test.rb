@@ -111,6 +111,13 @@ class FinderTest < Test::Unit::TestCase
     RAILS_DEFAULT_LOGGER.level = old_level
   end
   
+  def test_find_with_nonstandard_primary_key
+    db = Book.find(1137, {})
+    cache = Book.find(1137)
+    assert_equal db, cache
+    assert_equal Book.find(1137, 2001, {}), Book.find(1137, 2001)
+  end
+  
   ### Support methods
   
   def setup

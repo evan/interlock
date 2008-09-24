@@ -117,9 +117,9 @@ module Interlock
         # Load from the db
         ids_to_find = missed.values
         if ids_to_find.length > 1
-          records = find_all_by_id(ids_to_find, {})
+          records = send("find_all_by_#{primary_key}".to_sym, ids_to_find, {})
         else
-          records = [find_by_id(ids_to_find.first, {})].compact # explicitly just look for one if that's all that's needed
+          records = [send("find_by_#{primary_key}".to_sym, ids_to_find.first, {})].compact # explicitly just look for one if that's all that's needed
         end
 
         records = Hash[*(records.map do |record|
