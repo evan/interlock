@@ -34,14 +34,14 @@ class FinderTest < Test::Unit::TestCase
       Item.find([1, 2])
     assert_match(/model.*Item:find:1:default is loading from memcached/, log)
     assert_match(/model.*Item:find:2:default is loading from memcached/, log)    
-  end 
+  end
   
   def test_find_raise
     assert_raises(ActiveRecord::RecordNotFound) do
       Item.find(44)
-    end  
+    end
   end
-    
+
   def test_find_with_array_raise
     assert_raises(ActiveRecord::RecordNotFound) do
       # Once from the DB
@@ -50,7 +50,12 @@ class FinderTest < Test::Unit::TestCase
     assert_raises(ActiveRecord::RecordNotFound) do
       # Once from Memcached
       Item.find([1, 2, 44])
-    end  
+    end
+  end
+
+  def test_find_with_array_ignores_nil
+    assert_equal Item.find(1, nil, {}), Item.find(1, nil)
+    assert_equal Item.find([1, nil], {}), Item.find([1, nil])
   end
 
   def test_invalidate
@@ -60,7 +65,7 @@ class FinderTest < Test::Unit::TestCase
     assert_match(/model.*Item:find:1:default is loading from the db/, log)
     Item.find(1)
     assert_match(/model.*Item:find:1:default is loading from memcached/, log)  
-  end  
+  end 
 
   def test_find_all_by_id
     assert_equal Item.find_all_by_id(44, {}), 

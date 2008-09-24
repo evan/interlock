@@ -11,9 +11,12 @@ module Interlock
       args.pop if args.last.nil? or (args.last.is_a? Hash and !args.last.values.any?)
       return find_via_db(*args) if args.last.is_a? Hash or args.first.is_a? Symbol
 
-      records = find_via_cache(args.flatten, true)
+      ids = args.flatten.compact.uniq
+      return find_via_db(nil) if ids.blank? # fall back to activerecord if trying to find nil
+      
+      records = find_via_cache(ids, true)
 
-      if args.length > 1 or args.first.is_a? Array
+      if ids.length > 1
         records
       else
         records.first
@@ -113,7 +116,13 @@ module Interlock
         ids_to_keys = keys_to_ids.invert
 
         # Load from the db
-        records = find_all_by_id(missed.values, {})
+        ids_to_find = missed.values
+        if ids_to_find.length > 1
+          records = find_all_by_id(ids_to_find, {})
+        else
+          records = [find_by_id(ids_to_find.first, {})].compact # explicitly just look for one if that's all that's needed
+        end
+
         records = Hash[*(records.map do |record|
           [ids_to_keys[record.id], record]
         end.flatten)]
