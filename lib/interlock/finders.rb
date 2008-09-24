@@ -8,7 +8,6 @@ module Interlock
     # Any other options besides ids short-circuit the cache.
     #    
     def find(*args)
-      args.pop if args.last.nil? or (args.last.is_a? Hash and !args.last.values.any?)
       return find_via_db(*args) if args.last.is_a? Hash or args.first.is_a? Symbol
 
       ids = args.flatten.compact.uniq
