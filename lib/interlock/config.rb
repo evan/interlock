@@ -153,17 +153,10 @@ module Interlock
       # Configure ActiveRecord#find caching.
       #
       def install_finders
-        # RAILS_DEFAULT_LOGGER.warn "** using interlock finder caches"      
-        class << ActiveRecord::Base
-          private      
-          alias :find_via_db :find
-          remove_method :find
-          
-          public
-          include Interlock::Finders
-        end        
+        # RAILS_DEFAULT_LOGGER.warn "** using interlock finder caches"
+        ActiveRecord::Base.send(:include, Interlock::Finders)
       end
 
-    end      
+    end
   end
 end

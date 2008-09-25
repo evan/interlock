@@ -42,6 +42,5 @@ module ActiveRecord #:nodoc:
       super
     end
 
-            
   end
 end
