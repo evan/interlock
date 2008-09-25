@@ -130,13 +130,16 @@ module Interlock
         records.each do |key, value|
           Interlock.say key, "is loading from the db", "model"
           Interlock.local_cache.write(key, value, nil)
-          CACHE.set key, value unless Interlock.config[:disabled]
+          CACHE.set key, value, value.class.finder_ttl unless Interlock.config[:disabled]
         end
         
         current.merge!(records)
       end    
     end
     
+    def self.finder_ttl
+      0 # default to no timeout
+    end
   end
 end
   
