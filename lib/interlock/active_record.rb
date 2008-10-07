@@ -2,6 +2,7 @@
 module ActiveRecord #:nodoc:
   class Base
 
+    @@nil_sentinel = :_nil
 
     #
     # Convert this record to a tag string.
@@ -37,11 +38,31 @@ module ActiveRecord #:nodoc:
     #
     # Reload. Expires the cache and force reload from db.
     #
-    def reload
-      self.expire_interlock_keys
-      super
-    end
+    # def reload
+    #   self.expire_interlock_keys
+    #   super
+    # end
 
-            
+    def self.get_cache(key) 
+      return yield if Interlock.config[:disabled] 
+      data = CACHE.get(self.formalize(key)) 
+      return (data == @@nil_sentinel ? nil : data) unless data.nil? 
+
+      data = yield  
+
+      CACHE.set(self.formalize(key), data || @@nil_sentinel) 
+      return data 
+    end 
+
+    def self.expire_cache(key) 
+      CACHE.delete(self.formalize(key)) 
+    end 
+
+  protected 
+
+    def self.formalize(key) 
+      return [self.class_name, ':', Digest::MD5.hexdigest(key.to_s)].join 
+    end
+     
   end
 end

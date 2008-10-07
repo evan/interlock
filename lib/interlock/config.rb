@@ -1,4 +1,4 @@
-
+#require 'ehcache'
 module Interlock
 
   DEFAULTS = {
@@ -44,10 +44,10 @@ module Interlock
         end
 
         # Don't install memcached and fragments if it's :disabled in the config file.
-        unless Interlock.config[:disabled]
+        # unless Interlock.config[:disabled]
           install_memcached
           install_fragments        
-        end
+        # end
 
         # Always install the finders.
         install_finders if Interlock.config[:with_finders]
@@ -57,10 +57,10 @@ module Interlock
       # Configure memcached for this app.
       #
       def install_memcached
-        Interlock.config[:namespace] << "-#{RAILS_ENV.first}"
+        Interlock.config[:namespace] << (RAILS_ENV == 'production' ? ':pro:' : ':dev:')
   
         unless defined? Object::CACHE
-        
+
           # Give people a choice of client, even though I don't like conditional dependencies.
           klass = case Interlock.config[:client]
             when 'memcached'
@@ -80,17 +80,23 @@ module Interlock
                 raise ConfigurationError, "'memcache-client' client requested but not installed. Try 'sudo gem install memcache-client'."
               end
               
+            when 'ehcache' 
+              Ehcache::CacheManager.new.cache
             else
               raise ConfigurationError, "Invalid client name '#{Interlock.config[:client]}'"
           end
           
-          Object.const_set('CACHE', 
-            klass.new(
-              Interlock.config[:servers], 
-              Interlock.config.slice(*CLIENT_KEYS)
+          unless Interlock.config[:client] == 'ehcache'
+            Object.const_set('CACHE', 
+              klass.new(
+                Interlock.config[:servers], 
+                Interlock.config.slice(*CLIENT_KEYS)
+              )
             )
-          )
-          
+          else
+            Object.const_set('CACHE', klass)
+          end
+
           # Mark that we're the ones who did it.
           class << CACHE
             def installed_by_interlock; true; end
@@ -113,31 +119,46 @@ module Interlock
         class << CACHE
           include Interlock::Lock
           
-          def read(*args)
-            get args.first.to_s
+          # def read(*args)
+          #   get args.first.to_s
+          # end
+          # 
+          # def write(name, content, options = {})             
+          #   set(name.to_s, 
+          #     content, 
+          #     options.is_a?(Hash) ? options[:ttl] : Interlock.config[:ttl] )
+          # end
+          def read(*args) 
+            key = Interlock.convert_key(args.first.to_s) 
+            return nil if update_required?(key) 
+            get key 
           end
           
-          def write(name, content, options = {})             
-            set(name.to_s, 
-              content, 
-              options.is_a?(Hash) ? options[:ttl] : Interlock.config[:ttl] )
-          end          
-        end  
-              
+          def write(name, content, options = {}) 
+            name = Interlock.convert_key(name) 
+            if options.is_a?(Hash) && options.key?(:expire) 
+              set("#{name}_expiry",  Time.now + options[:expire].seconds) 
+              update_and_unlock(name) { content } 
+            else 
+              set(name,  
+                content,  
+                options.is_a?(Hash) ? options[:ttl] : Interlock.config[:ttl] ) 
+            end
+          end
+          
+          private 
+         	 
+         	def update_required?(key) 
+         	  expiry_time = get("#{key}_expiry") 
+         	  expiry_time && expiry_time < Time.now && lock_for_update(key) 
+         	end
+        end    
       end
       
       #
       # Configure Rails to use the memcached store for fragments, and optionally, sessions.
       #    
       def install_fragments
-        # Memcached fragment caching is mandatory        
-        ActionView::Helpers::CacheHelper.class_eval do
-          def cache(name, options = nil, &block)
-            # Things explode if options does not default to nil
-            RAILS_DEFAULT_LOGGER.debug "** fragment #{name} stored via obsolete cache() call"
-            @controller.cache_erb_fragment(block, name, options)
-          end
-        end                
         ActionController::Base.cache_store = CACHE
   
         # Sessions are optional

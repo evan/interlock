@@ -175,7 +175,7 @@ And in the <tt>show.html.erb</tt> view:
         cache_store.write(key, content, options)
         Interlock.local_cache.write(key, content, options)
 
-        Interlock.say key, "wrote"
+        Interlock.say key, "wrote (converted to #{Interlock.convert_key(key)})"
 
         block_content
       end
@@ -225,5 +225,27 @@ And in the <tt>show.html.erb</tt> view:
       end
       
     end
-  end    
+    
+    # With Rails 2.1 action caching, we need to slip in our :expire param into the ActionCacheFilter options, so that when we 
+    # write_fragment we can pass that in and allow shane's #{key}_expiry to take effect 
+    # (see def write in interlock/config.rb) 
+    module Actions 
+
+      module ClassMethods 
+        def caches_action(*actions) 
+          return unless cache_configured? 
+          options = actions.extract_options! 
+          around_filter(ActionCacheFilter.new(:cache_path => options.delete(:cache_path), :expire => options.delete(:expire)), {:only => actions}.merge(options)) 
+        end 
+      end 
+   
+      class ActionCacheFilter #:nodoc: 
+        def after(controller) 
+          return if controller.rendered_action_cache || !caching_allowed(controller) 
+          controller.write_fragment(controller.action_cache_path.path, controller.response.body, :expire => @options[:expire]) # pass in our :expire 
+        end 
+      end
+    end    
+
+  end
 end
