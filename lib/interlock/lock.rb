@@ -20,6 +20,7 @@ module Interlock
           # Nil is a successful response for Memcached, so we'll simulate the MemCache
           # API.
           response ||= "STORED\r\n"
+        rescue Memcached::NotStored # do nothing
         rescue Memcached::Errors
           # if memcached raises one of these errors, lets assume the servers down
           return nil
