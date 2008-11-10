@@ -2,6 +2,7 @@
 module ActiveRecord #:nodoc:
   class Base
 
+    @@nil_sentinel = :_nil
 
     #
     # Convert this record to a tag string.
@@ -30,9 +31,7 @@ module ActiveRecord #:nodoc:
       end
     end
     
-
     before_save :expire_interlock_keys
     after_destroy :expire_interlock_keys
-
   end
 end

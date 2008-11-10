@@ -13,7 +13,11 @@ require 'interlock/finders'
 require 'interlock/active_record'
 
 begin
-  require 'memcached'
+  if defined?(JRUBY_VERSION)
+    require 'memcache-client'
+  else
+    require 'memcached'
+  end
 rescue LoadError
 end
 

@@ -43,5 +43,26 @@ module Interlock
       raise ::Interlock::LockAcquisitionError, "Couldn't acquire lock for #{key}"
     end
     
+    # update key content and release lock 
+   	def update_and_unlock(key) 
+   	  begin 
+   	    value = yield(CACHE.get(key)) 
+   	    CACHE.set(key, value) 
+   	    return value 
+   	  ensure  
+   	    CACHE.delete("lock:#{key}") 
+   	  end 
+   	end 
+   	
+   	# locks cache key for a pending update, returning true if lock successful and false if not 
+   	def lock_for_update(key, lock_expiry = 30) 
+   	  begin 
+   	    CACHE.add("lock:#{key}", "Locked by #{Process.pid}", lock_expiry) 
+   	    response = true 
+   	  rescue Object => e 
+   	    response = false 
+   	  end 
+   	  response 
+   	end
   end
 end
