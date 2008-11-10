@@ -5,6 +5,7 @@ class CreateBooks < ActiveRecord::Migration
       t.string :description
       t.timestamps
     end
+    add_column :books, :guid, :integer, :primary => true
   end
 
   def self.down
