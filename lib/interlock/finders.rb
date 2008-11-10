@@ -19,9 +19,8 @@ module Interlock
       #    
       def find(*args)
         return find_via_db(*args) if args.last.is_a? Hash or args.first.is_a? Symbol
-
         ids = args.flatten.compact.uniq
-        return find_via_db(nil) if ids.blank? # fall back to activerecord if trying to find nil
+        return find_via_db(ids) if ids.blank? 
       
         records = find_via_cache(ids, true)
 

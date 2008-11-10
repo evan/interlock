@@ -19,13 +19,12 @@ class InterlockTest < Test::Unit::TestCase
       'generated keys should not contain illegal characters'
   end
   
-  def test_register_dependencies_with_many_keys_one_dependency
-    
+  def disabled_test_register_dependencies_with_many_keys_one_dependency    
     assert_nothing_raised do
       (1..5000).each do |i|
         Interlock.register_dependencies({Item=>:id}, Interlock.caching_key("a"*200, "show", i, nil))
       end
-    end
-    
+    end    
   end
+  
 end

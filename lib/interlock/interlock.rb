@@ -115,8 +115,8 @@ module Interlock
     # to reduce lock contention.
     #
     def dependency_key(klass, scope, key) 
-      extra_bit = (scope == :id ? key.field(4) : nil)
-      "interlock:#{ENV['RAILS_ASSET_ID']}:dependency:#{klass.name}:#{extra_bit}"
+      id = (scope == :id ? ":#{key.field(4)}" : nil)
+      "interlock:#{ENV['RAILS_ASSET_ID']}:dependency:#{klass.name}#{id}"
     end
     
     # 
@@ -148,15 +148,8 @@ module Interlock
     def invalidate(key)
       # Console and tests do not install the local cache
       Interlock.local_cache.delete(key) if Interlock.local_cache
-
-      ActionController::Base.cache_store.delete Interlock.convert_key(key)
+      ActionController::Base.cache_store.delete key
     end
-    
-    # in order to account for special characters (ÃŠâ€â¥ÏÂ¥ÆÂ©Ã§Ã¥Ãžâ Ë...etc) and key lengths beyond 250, we 
-   	# convert our keys to an md5 hash, which ensures proper characters as well as length 
-   	def convert_key(key) 
-   	  Digest::MD5.hexdigest(key.to_s) 
-   	end
-    
+
   end    
 end

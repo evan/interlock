@@ -27,13 +27,13 @@ module ActiveRecord #:nodoc:
       
       # Fragments
       self.expire_interlock_keys_for_dependency(Interlock.dependency_key(self.class.base_class, :all, nil))
-      self.expire_interlock_keys_for_dependency(Interlock.dependency_key(self.class.base_class, :id, "::::#{self.to_param.to_s}:"))
+      self.expire_interlock_keys_for_dependency(Interlock.dependency_key(self.class.base_class, :id, "::::#{to_param}:"))
       
       # Models
       if Interlock.config[:with_finders]
         key = self.class.base_class.caching_key(self.id)
         Interlock.say key, 'invalidated with finders', 'model'
-        Interlock.invalidate(key)
+        Interlock.invalidate key
       end
     end
     
@@ -44,13 +44,11 @@ module ActiveRecord #:nodoc:
     #
     # Reload. Expires the cache and force reload from db.
     #
-    def reload_with_interlock(options)
-      self.expire_interlock_keys
-      reload_without_interlock(options)
+    def reload_with_expiry(*args)
+      expire_interlock_keys
+      reload_without_expiry(*args)
     end
-    alias_method_chain :reload, :interlock
-  
-    private
+    alias_method_chain :reload, :expiry
   
     def expire_interlock_keys_for_dependency(dependency_key)
       (CACHE.get(dependency_key) || {}).each do |key, scope|

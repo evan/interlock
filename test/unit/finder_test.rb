@@ -82,11 +82,15 @@ class FinderTest < Test::Unit::TestCase
   end
   
   def test_update_attributes_should_invalidate
-    # and thus update as well
-    item = Item.find(1) # get it cached
-    Item.update(1, :name => 'Updated')
+    item = Item.find(1)
+    name = item.name
+
+    item.update_attributes!(:name => 'Updated')
     updated_item = Item.find(1)
     assert_equal 'Updated', item.name
+
+    # Restore name for further tests
+    item.update_attributes!(:name => name)
   end
   
   def test_update_all_should_invalidate
@@ -94,7 +98,7 @@ class FinderTest < Test::Unit::TestCase
   end
   
   def test_update_counters_should_invalidate
-    item = Item.find(1) # get it cached
+    item = Item.find(1)
     Item.update_counters(1, :counting_something => 1)
     updated_item = Item.find(1)
     assert_equal updated_item.counting_something, item.counting_something + 1
@@ -140,10 +144,10 @@ class FinderTest < Test::Unit::TestCase
   end
   
   def test_find_with_nonstandard_primary_key
-    db = Book.find(1137, {})
+    db = Book.find_via_db(1137)
     cache = Book.find(1137)
     assert_equal db, cache
-    assert_equal Book.find(1137, 2001, {}), Book.find(1137, 2001)
+    assert_equal Book.find_via_db(1137, 2001, :order => "guid ASC"), Book.find(1137, 2001)
   end
   
   ### Support methods

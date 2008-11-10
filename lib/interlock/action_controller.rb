@@ -177,7 +177,7 @@ And in the <tt>show.html.erb</tt> view:
         cache_store.write(key, content, options)
         Interlock.local_cache.write(key, content, options)
 
-        Interlock.say key, "wrote (converted to #{Interlock.convert_key(key)})"
+        Interlock.say key, "wrote"
 
         block_content
       end
