@@ -99,7 +99,7 @@ class ServerTest < Test::Unit::TestCase
     assert_no_match(/recent:all:3 is running the controller block/, log)
     
     truncate
-    remote_eval("Item.find(1).update_attribute('updated_at', Time.now)")
+    remote_eval("Item.find(1).update_attributes!(:description=>'need to change something to get past the rails 2.1 partial update logic')")
     assert_match(/Artichoke/, browse("items/recent?seconds=4"))
     assert_match(/recent:all:4 is running the controller block/, log)
 

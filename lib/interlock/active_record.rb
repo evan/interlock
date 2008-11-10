@@ -16,14 +16,10 @@ module ActiveRecord #:nodoc:
     #
     def expire_interlock_keys
       return if Interlock.config[:disabled] or (defined? CGI::Session::ActiveRecordStore and is_a? CGI::Session::ActiveRecordStore::Session)
-
+      
       # Fragments
-      (CACHE.get(Interlock.dependency_key(self.class.base_class)) || {}).each do |key, scope|
-        if scope == :all or (scope == :id and key.field(4) == self.to_param.to_s)
-          Interlock.say key, "invalidated by rule #{self.class} -> #{scope.inspect}."
-          Interlock.invalidate key
-        end
-      end
+      self.expire_interlock_keys_for_dependency(Interlock.dependency_key(self.class.base_class, :all, nil))
+      self.expire_interlock_keys_for_dependency(Interlock.dependency_key(self.class.base_class, :id, "::::#{self.to_param.to_s}:"))
       
       # Models
       if Interlock.config[:with_finders]
@@ -32,6 +28,7 @@ module ActiveRecord #:nodoc:
     end
     
     before_save :expire_interlock_keys
+    after_save :expire_interlock_keys
     after_destroy :expire_interlock_keys
 
     #
@@ -42,6 +39,15 @@ module ActiveRecord #:nodoc:
       reload_without_interlock(options)
     end
     alias_method_chain :reload, :interlock
-            
+  
+    private
+  
+    def expire_interlock_keys_for_dependency(dependency_key)
+      (CACHE.get(dependency_key) || {}).each do |key, scope|
+        Interlock.say key, "invalidated by rule #{self.class} -> #{scope.inspect}."
+        Interlock.invalidate key
+      end      
+    end
+    
   end
 end

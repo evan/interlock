@@ -123,6 +123,8 @@ And in the <tt>show.html.erb</tt> view:
       
       raise Interlock::UsageError, ":ttl has no effect in a behavior_cache block" if options[:ttl]
 
+      Interlock.say "key", "yo: #{options.inspect} -- #{dependencies.inspect}"
+
       key = caching_key(options.value_for_indifferent_key(:ignore), options.value_for_indifferent_key(:tag))      
 
       if options[:perform] == false || Interlock.config[:disabled]
