@@ -70,7 +70,35 @@ class FinderTest < Test::Unit::TestCase
     assert_match(/model.*Item:find:1:default is loading from the db/, log)
     Item.find(1)
     assert_match(/model.*Item:find:1:default is loading from memcached/, log)  
-  end 
+  end
+  
+  def test_reload_should_invalidate
+    item = Item.find(1)
+    item.reload
+    assert_match(/model.*Item:find:1:default invalidated with finders/, log)
+    truncate
+    Item.find(1)
+    assert_match(/model.*Item:find:1:default is loading from memcached/, log)  
+  end
+  
+  def test_update_attributes_should_invalidate
+    # and thus update as well
+    item = Item.find(1) # get it cached
+    Item.update(1, :name => 'Updated')
+    updated_item = Item.find(1)
+    assert_equal 'Updated', item.name
+  end
+  
+  def test_update_all_should_invalidate
+    # TODO
+  end
+  
+  def test_update_counters_should_invalidate
+    item = Item.find(1) # get it cached
+    Item.update_counters(1, :counting_something => 1)
+    updated_item = Item.find(1)
+    assert_equal updated_item.counting_something, item.counting_something + 1
+  end
 
   def test_find_all_by_id
     assert_equal Item.find_all_by_id(44, {}), 

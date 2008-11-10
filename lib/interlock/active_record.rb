@@ -4,6 +4,14 @@ module ActiveRecord #:nodoc:
 
     @@nil_sentinel = :_nil
 
+    class << self # Class methods    
+      def update_counters_with_expiry(id, counters)
+        update_counters_without_expiry(id, counters)
+        find(id).expire_interlock_keys
+      end
+      alias_method_chain :update_counters, :expiry      
+    end
+    
     #
     # Convert this record to a tag string.
     #
@@ -23,7 +31,9 @@ module ActiveRecord #:nodoc:
       
       # Models
       if Interlock.config[:with_finders]
-        Interlock.invalidate(self.class.base_class.caching_key(self.id))
+        key = self.class.base_class.caching_key(self.id)
+        Interlock.say key, 'invalidated with finders', 'model'
+        Interlock.invalidate(key)
       end
     end
     
