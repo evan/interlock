@@ -17,9 +17,10 @@ module Interlock
         # for this.        
         begin
           response = CACHE.add("lock:#{key}", "Locked by #{Process.pid}", lock_expiry)
-          # Nil is a successful response for Memcached, so we'll simulate the MemCache
-          # API.
-          response ||= "STORED\r\n"
+          # Nil is a successful response for Memcached 0.11, so we'll simulate the MemCache API.          
+          if response == true or response == nil
+            response = "STORED\r\n"
+          end
         rescue Memcached::NotStored # do nothing
         rescue Memcached::Errors
           # if memcached raises one of these errors, lets assume the servers down
