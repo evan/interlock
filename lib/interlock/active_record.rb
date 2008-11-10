@@ -33,5 +33,15 @@ module ActiveRecord #:nodoc:
     
     before_save :expire_interlock_keys
     after_destroy :expire_interlock_keys
+
+    #
+    # Reload. Expires the cache and force reload from db.
+    #
+    def reload_with_interlock(options)
+      self.expire_interlock_keys
+      reload_without_interlock(options)
+    end
+    alias_method_chain :reload, :interlock
+            
   end
 end
