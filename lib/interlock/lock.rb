@@ -22,11 +22,6 @@ module Interlock
             response = "STORED\r\n"
           end
         rescue Memcached::NotStored # do nothing
-        rescue Memcached::Errors
-          # if memcached raises one of these errors, lets assume the servers down
-          return nil
-        rescue Object => e
-          # Catch exceptions from Memcached without setting response.
         end
         
         if response == "STORED\r\n"
