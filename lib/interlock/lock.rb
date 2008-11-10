@@ -17,14 +17,13 @@ module Interlock
         # for this.        
         begin
           response = CACHE.add("lock:#{key}", "Locked by #{Process.pid}", lock_expiry)
-          # Nil is a successful response for Memcached 0.11, so we'll simulate the MemCache API.          
-          if response == true or response == nil
-            response = "STORED\r\n"
-          end
-        rescue Memcached::NotStored # do nothing
+          # Nil is a successful response for Memcached 0.11, and "STORED\r\n" for MemCache.
+          response = [true, nil, "STORED\r\n"].include?(response)
+        rescue Memcached::NotStored 
+          # Do nothing
         end
         
-        if response == "STORED\r\n"
+        if response
           begin
             value = yield(CACHE.get(key))
             CACHE.set(key, value)
@@ -33,32 +32,13 @@ module Interlock
             CACHE.delete("lock:#{key}")
           end
         else
+          # Wait
           sleep((2**count) / 2.0)
         end
       end
+      
       raise ::Interlock::LockAcquisitionError, "Couldn't acquire lock for #{key}"
     end
     
-    # update key content and release lock 
-   	def update_and_unlock(key) 
-   	  begin 
-   	    value = yield(CACHE.get(key)) 
-   	    CACHE.set(key, value) 
-   	    return value 
-   	  ensure  
-   	    CACHE.delete("lock:#{key}") 
-   	  end 
-   	end 
-   	
-   	# locks cache key for a pending update, returning true if lock successful and false if not 
-   	def lock_for_update(key, lock_expiry = 30) 
-   	  begin 
-   	    CACHE.add("lock:#{key}", "Locked by #{Process.pid}", lock_expiry) 
-   	    response = true 
-   	  rescue Object => e 
-   	    response = false 
-   	  end 
-   	  response 
-   	end
   end
 end
