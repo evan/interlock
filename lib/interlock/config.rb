@@ -132,10 +132,10 @@ module Interlock
       def install_fragments
         # Memcached fragment caching is mandatory        
         ActionView::Helpers::CacheHelper.class_eval do
-          def cache(name, options = nil, &block)
+          def cache(name = {}, options = nil, &block)
             # Things explode if options does not default to nil
             RAILS_DEFAULT_LOGGER.debug "** fragment #{name} stored via obsolete cache() call"
-            @controller.cache_erb_fragment(block, name, options)
+            @controller.fragment_for(output_buffer, name, options, &block)
           end
         end                
         ActionController::Base.cache_store = CACHE
