@@ -9,13 +9,26 @@ module Interlock
     :with_finders => false
   }    
   
-  CLIENT_KEYS = [ 
-    :hash,
-    :no_block,
-    :buffer_requests,
-    :support_cas,
-    :tcp_nodelay,
+  CLIENT_KEYS =[
+    :prefix_key,
     :distribution,
+    :verify_key,
+    :tcp_nodelay,
+    :hash,
+    :hash_with_prefix_key,
+    :show_backtraces,
+    :default_ttl,
+    :ketama_weighted,
+    :retry_timeout,
+    :default_weight,
+    :buffer_requests,
+    :timeout,
+    :sort_hosts,
+    :cache_lookups,
+    :connect_timeout,
+    :no_block,
+    :failover,
+    :support_cas,
     :namespace
   ] 
 
