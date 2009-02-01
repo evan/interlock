@@ -53,11 +53,8 @@ See ActionController::Base for explanations of the rest of the options. The <tt>
          # Interlock.say key, "is rendering"
 
          @cached_content_for, previous_cached_content_for = {}, @cached_content_for
-         ::ActionView::TemplateHandlers::ERB.new(@controller).cache_fragment(
-           block, 
-           key, 
-           :ttl => (options.value_for_indifferent_key(:ttl) or Interlock.config[:ttl])
-         )
+
+         cache key, :ttl => (options.value_for_indifferent_key(:ttl) or Interlock.config[:ttl]), &block
          
          # This is tricky. If we were already caching content_fors in a parent block, we need to 
          # append the content_fors set in the inner block to those already set in the outer block. 
