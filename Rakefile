@@ -4,8 +4,8 @@ require 'echoe'
 Echoe.new("interlock") do |p|
   p.project = "fauna"
   p.summary = "A Rails plugin for maintainable and high-efficiency caching."
-  p.url = "http://blog.evanweaver.com/files/doc/fauna/interlock/"  
-  p.docs_host = "blog.evanweaver.com:~/www/bax/public/files/doc/"  
+  p.url = "http://github.com/evan/interlock/"  
+  p.docs_host = "evan.github.com/fauna/"  
   p.test_pattern = ["test/integration/*.rb", "test/unit/*.rb"]
   p.rdoc_pattern = ["README", "CHANGELOG", "TODO", "LICENSE", "lib/interlock/lock.rb", "lib/interlock/interlock.rb", "lib/interlock/action_controller.rb", "lib/interlock/active_record.rb", "lib/interlock/finders.rb", "lib/interlock/action_view.rb", "lib/interlock/config.rb"]
   p.clean_pattern += ['test/integration/app/coverage', 'test/integration/app/db/schema.rb',
